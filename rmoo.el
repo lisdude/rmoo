@@ -677,6 +677,23 @@ on the last line of the buffer.")
   (rmoo-upload-buffer-directly)
   (rmoo-destroy))
 
+;; kilo stuff
+;; ----------
+(defun match-kilo (line)
+  (let (start end)
+    (setq start (goto-char (marker-position
+                            (process-mark 
+                             (get rmoo-world-here 'process)))))
+    (insert-before-markers (concat (replace-regexp-in-string "kilo" "KILO" line) "\n"))
+    (save-restriction
+      (run-hooks 'rmoo-handle-text-hooks)
+      (rmoo-recenter))))
+
+(defun rmoo-highlight-text-func (line)
+  (if (string-match "kilo" line)
+    #'match-kilo))
+
+(add-hook 'rmoo-handle-text-redirect-functions 'rmoo-highlight-text-func)
 ;;
 ;; $Log: rmoo.el,v $
 ;; Revision 1.12  2000/10/18 21:33:39  mattcampbell
