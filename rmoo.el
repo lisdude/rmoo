@@ -693,7 +693,18 @@ on the last line of the buffer.")
   (if (string-match "kilo" line)
     #'match-kilo))
 
-(add-hook 'rmoo-handle-text-redirect-functions 'rmoo-highlight-text-func)
+;; TODO: get kilo from world var, unload kwds when mode disabled.
+(setq rmoo-kwds
+      '(("kilo" . font-lock-function-name-face)
+        ("Merla" . font-lock-function-name-face)))
+(define-minor-mode rmoo-minor-mode "rmoo-minor-mode"
+  :lighter "rmoo-min" :require 'rmoo-interactive-mode :global t :group 'rmoo :version "0.1"
+  (font-lock-add-keywords nil rmoo-kwds))
+
+;; No longer need this as instead of doing regexp matching, we're aiming
+;; proper syntax highlighting.
+;(add-hook 'rmoo-handle-text-redirect-functions 'rmoo-highlight-text-func)
+
 ;;
 ;; $Log: rmoo.el,v $
 ;; Revision 1.12  2000/10/18 21:33:39  mattcampbell
