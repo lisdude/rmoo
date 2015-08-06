@@ -698,7 +698,7 @@ on the last line of the buffer.")
       '(("kilo" . font-lock-function-name-face)
         ("Merla" . font-lock-function-name-face)))
 (define-minor-mode rmoo-minor-mode "rmoo-minor-mode"
-  :lighter "rmoo-min" :require 'rmoo-interactive-mode :global t :group 'rmoo :version "0.1"
+  :lighter "rmoo-min" :require 'rmoo-interactive-mode :global nil :group 'rmoo :version "0.1"
   (font-lock-add-keywords nil rmoo-kwds))
 
 ;; No longer need this as instead of doing regexp matching, we're aiming
