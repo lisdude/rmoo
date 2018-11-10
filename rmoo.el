@@ -30,7 +30,7 @@
 (defvar rmoo-logfile nil "The path of the world's log file\nTaken from the logfile property of a MOO world.")
 (make-variable-buffer-local 'rmoo-logfile)
 (make-variable-buffer-local 'rmoo-tls)
-(defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo)
+(defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo :type 'function)
 (defvar rmoo-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'rmoo-send)
@@ -499,7 +499,7 @@ Keymap:
 
 (defun rmoo-request-port-maybe (world)
   (or (get world 'port)
-      (string-to-int (read-string "Port: "))))
+      (string-to-number (read-string "Port: "))))
 
 (defun rmoo-request-tls-maybe (world)
   (or (get world 'tls)
@@ -587,13 +587,6 @@ Keymap:
   (prog1
       (point)
     (rmoo-beginning-of-line)))
-
-(defun rmoo-beginning-of-line ()
-  "Move point to beginning-of-line, but after prompt character."
-  (interactive)
-  (beginning-of-line 1)
-  (if (looking-at rmoo-prompt)
-      (forward-char (length rmoo-prompt))))
 
 (defvar rmoo-send-functions nil "A list of functions called everytime a line of input is send to a MOO process as a command in rmoo-interactive-mode. Each function is called with one argument, the line to be sent.")
 
