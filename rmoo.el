@@ -12,7 +12,7 @@
 ;;
 (provide 'rmoo)
 (require 'cl)
-(require 'comint) ; All that's needed from comint is comint-read-noecho. 
+(require 'comint) ; All that's needed from comint is comint-read-noecho.
 (require 'xterm-color)
 
 ;;
@@ -125,7 +125,7 @@ Keymap:
   (run-hooks 'rmoo-interactive-mode-hooks))
 
 ;;
-;; rmoo-filter doesn't run any hooks, but rmoo-handle-text does. 
+;; rmoo-filter doesn't run any hooks, but rmoo-handle-text does.
 ;;
 (defun rmoo-filter (proc string)
   (let ((old-buf (current-buffer))
@@ -158,10 +158,10 @@ Keymap:
 		       (get rmoo-world-here 'goto-buffer))
 	      (put rmoo-world-here 'goto-function nil)
 	      (put rmoo-world-here 'goto-buffer nil)))))
-	
+
 ;;
 ;; Note that a moo output-function can always expect to be called in
-;; the process buffer. 
+;; the process buffer.
 ;;
 
 ;;
@@ -204,7 +204,7 @@ Keymap:
 ;; More intelligent functions can be put in the MOO's output-function
 ;; property. If the default behavior suffices most of the time but you'd
 ;; like your function called on certain lines, put a matching function in
-;; rmoo-handle-text-redirect-functions. 
+;; rmoo-handle-text-redirect-functions.
 ;;
 (defvar rmoo-handle-text-redirect-functions nil "Functions called on each line of output. Each function in this list should take one argument, a string, and return a function (which is called on the line) or nil.")
 
@@ -230,7 +230,7 @@ Keymap:
 	(apply new-handler (list line))
       (let (start end)
 	(setq start (goto-char (marker-position
-				(process-mark 
+				(process-mark
 				 (get rmoo-world-here 'process)))))
 	(insert-before-markers (concat line "\n"))
 	(save-restriction
@@ -247,7 +247,7 @@ Keymap:
 
 
 ;;
-;; MOO worlds. 
+;; MOO worlds.
 ;;
 ;;
 ;; Some properties of moo worlds:
@@ -441,7 +441,7 @@ Keymap:
       (let ((end (rmoo-find-input)))
 	(delete-region (point) end)
 	(insert (rmoo-history-ref rmoo-input-history rmoo-input-index)))))
-  
+
 (defun rmoo-match-input-history (delta)
   (message (prin1-to-string last-command))
   (cond ((rmoo-history-empty-p rmoo-input-history)
@@ -452,14 +452,14 @@ Keymap:
 	 (setq rmoo-input-index 0)))
   (setq this-command 'rmoo-match-input-history)
   (let* ((str (concat "^"
-		      (regexp-quote (save-excursion 
+		      (regexp-quote (save-excursion
 				      (buffer-substring (rmoo-find-input)
 							(point))))))
 	 (tail (nth 1 rmoo-input-history))
 	 (vec (nthcdr 2 rmoo-input-history))
 	 (size (length vec))
 	 (found-match nil))
-    (while (not (or (eq rmoo-input-index 
+    (while (not (or (eq rmoo-input-index
 			(+ rmoo-input-index (* delta size)))
 		    found-match))
       (if (string-match str (rmoo-history-ref rmoo-input-history
@@ -484,7 +484,7 @@ Keymap:
 
 ;;
 ;; Various reading functions.
-;;				    
+;;
 (defun rmoo-request-world ()
   (intern (completing-read "MOO world: " rmoo-worlds nil t) rmoo-worlds))
 
@@ -609,7 +609,7 @@ on the last line of the buffer.")
      (rmoo-eobp))))
     (progn
       (ding)
-      (message "Must be on the last lien of the buffer."))
+      (message "Must be on the last line of the buffer."))
     (progn
       (let ((proc (get rmoo-world-here 'process)))
         (cond ((and proc (memq (process-status proc) '(open run)))
@@ -636,7 +636,7 @@ on the last line of the buffer.")
 	       (setq func (car funcs))
 	       (setq funcs (cdr funcs))
 	       (funcall func line))))
-	     
+
 	  (t
 	   (message "Not connected--- nothing sent.")
 	   (insert ?\n)))))))
