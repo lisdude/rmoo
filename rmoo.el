@@ -26,6 +26,9 @@
 (defvar rmoo-interactive-mode-syntax-table nil "Syntax table for use with MOO interactive mode.")
 (defvar rmoo-interactive-mode-hooks nil "A list of hooks run when a buffer changes to MOO interactive mode.")
 (defvar rmoo-autologin t "If a world has a login property, use it to automatically connect when rmoo is run.")
+(defvar rmoo-tls nil "Indicate whether a connection should use TLS.\nTaken from the tls property of a MOO world.")
+(make-variable-buffer-local 'rmoo-tls)
+(defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo)
 (defvar rmoo-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'rmoo-send)
@@ -52,12 +55,13 @@
       (let* ((buf (get-buffer-create buf-name))
 	     (site (rmoo-request-site-maybe world))
 	     (port (rmoo-request-port-maybe world))
+         (tls (rmoo-request-tls-maybe world))
 	     (login (rmoo-request-login-maybe world))
 	     (passwd (rmoo-request-passwd-maybe world))
 	     (proc (if (string-match "^[.0-9]+$" site)
-		       (start-process site buf "telnet" site 
-				      (int-to-string port))
-		     (open-network-stream site buf site port))))
+				 (start-process site buf "telnet" site (int-to-string port))
+				 (funcall rmoo-connect-function  site buf site port :type tls ))))
+		(set-network-process-option proc :keepalive t)
 	(put world 'process proc)
 	(or (get world 'output-function)
 	    (put world 'output-function 'rmoo-handle-text))
@@ -245,6 +249,7 @@ Keymap:
 ;;                  password
 ;;                  site
 ;;                  port
+;;                  tls
 ;;                  process
 ;;                  pending-output
 ;;                  output-buffer
@@ -257,7 +262,7 @@ Keymap:
 (defvar rmoo-worlds-max-worlds 100 "The maximum number of MOO's")
 (defvar rmoo-worlds (make-vector rmoo-worlds-max-worlds 0 ))
 (defvar rmoo-worlds-add-rmoo-functions nil "A list of functions run every time that a MOO world is added. Each function in this list should take a single argument, a rmoo-world.")
-(defvar rmoo-worlds-properties-to-save '(login passwd site port))
+(defvar rmoo-worlds-properties-to-save '(login passwd site port tls))
 (defvar rmoo-worlds-file (expand-file-name "~/.rmoo_worlds") "The name of a file containg MOO worlds.")
 (defvar rmoo-worlds-map (make-sparse-keymap) "MOO worlds keymap")
 
@@ -280,9 +285,12 @@ Keymap:
       (funcall func world))))
 
 ;;;###autoload
-(defun rmoo-worlds-add-new-moo (name site port)
-  (interactive "sWorld name: \nsSite: \nnPort: ")
-  (rmoo-worlds-add-moo name (list "site" site) (list "port" port)))
+(defun rmoo-worlds-add-new-moo (name site port tls)
+  (interactive "sWorld name: \nsSite: \nnPort: \nsTLS/SSL? ")
+  (if (string="y" tls)
+    (setq tls 'tls)
+    (setq tls 'network))
+  (rmoo-worlds-add-moo name (list "site" site) (list "port" port) (list "tls" tls)))
 
 (defun rmoo-worlds-save-worlds-to-file ()
   "Save rmoo-world-here's worlds to rmoo-worlds-file if it's not \"\". Otherwise, prompt for a file name and save there."
@@ -474,6 +482,10 @@ Keymap:
 (defun rmoo-request-port-maybe (world)
   (or (get world 'port)
       (string-to-int (read-string "Port: "))))
+
+(defun rmoo-request-tls-maybe (world)
+  (or (get world 'tls)
+      (read-string "TLS/SSL? ")))
 
 (defun rmoo-request-login-maybe (world)
   (or (get world 'login)
