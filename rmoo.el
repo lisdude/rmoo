@@ -27,6 +27,8 @@
 (defvar rmoo-interactive-mode-hooks nil "A list of hooks run when a buffer changes to MOO interactive mode.")
 (defvar rmoo-autologin t "If a world has a login property, use it to automatically connect when rmoo is run.")
 (defvar rmoo-tls nil "Indicate whether a connection should use TLS.\nTaken from the tls property of a MOO world.")
+(defvar rmoo-logfile nil "The path of the world's log file\nTaken from the logfile property of a MOO world.")
+(make-variable-buffer-local 'rmoo-logfile)
 (make-variable-buffer-local 'rmoo-tls)
 (defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo)
 (defvar rmoo-interactive-mode-map
@@ -57,6 +59,7 @@
 	     (site (rmoo-request-site-maybe world))
 	     (port (rmoo-request-port-maybe world))
          (tls (rmoo-request-tls-maybe world))
+   	     (logfile (rmoo-request-logfile-maybe world))
 	     (login (rmoo-request-login-maybe world))
 	     (passwd (rmoo-request-passwd-maybe world))
 	     (proc (if (string-match "^[.0-9]+$" site)
@@ -116,6 +119,7 @@ Keymap:
   (newline)
   (goto-char (point-max))
   (setq rmoo-prompt (or (get rmoo-world-here 'prompt) rmoo-prompt))
+  (setq rmoo-logfile (or (get rmoo-world-here 'logfile) rmoo-logfile))
   (set-marker (process-mark proc) (point))
   (insert rmoo-prompt)
   (run-hooks 'rmoo-interactive-mode-hooks))
@@ -251,6 +255,7 @@ Keymap:
 ;;                  site
 ;;                  port
 ;;                  tls
+;;                  logfile
 ;;                  process
 ;;                  pending-output
 ;;                  output-buffer
@@ -263,8 +268,8 @@ Keymap:
 (defvar rmoo-worlds-max-worlds 100 "The maximum number of MOO's")
 (defvar rmoo-worlds (make-vector rmoo-worlds-max-worlds 0 ))
 (defvar rmoo-worlds-add-rmoo-functions nil "A list of functions run every time that a MOO world is added. Each function in this list should take a single argument, a rmoo-world.")
-(defvar rmoo-worlds-properties-to-save '(login passwd site port tls))
-(defvar rmoo-worlds-file (expand-file-name "~/.rmoo_worlds") "The name of a file containg MOO worlds.")
+(defvar rmoo-worlds-properties-to-save '(login passwd site port tls logfile))
+(defvar rmoo-worlds-file (expand-file-name "~/.rmoo_worlds") "The name of a file containing MOO worlds.")
 (defvar rmoo-worlds-map (make-sparse-keymap) "MOO worlds keymap")
 
 (define-key rmoo-interactive-mode-map "\C-c\C-w" rmoo-worlds-map)
@@ -286,12 +291,14 @@ Keymap:
       (funcall func world))))
 
 ;;;###autoload
-(defun rmoo-worlds-add-new-moo (name site port tls)
-  (interactive "sWorld name: \nsSite: \nnPort: \nsTLS/SSL? ")
+(defun rmoo-worlds-add-new-moo (name site port tls logfile)
+  (interactive "sWorld name: \nsSite: \nnPort: \nsTLS/SSL? \nsLog File Path: ")
   (if (string="y" tls)
     (setq tls 'tls)
     (setq tls 'network))
-  (rmoo-worlds-add-moo name (list "site" site) (list "port" port) (list "tls" tls)))
+  (if (string="" logfile)
+    (setq logfile nil))
+  (rmoo-worlds-add-moo name (list "site" site) (list "port" port) (list "tls" tls) (list "logfile" logfile)))
 
 (defun rmoo-worlds-save-worlds-to-file ()
   "Save rmoo-world-here's worlds to rmoo-worlds-file if it's not \"\". Otherwise, prompt for a file name and save there."
@@ -403,7 +410,9 @@ Keymap:
 
 (defun rmoo-remember-input (string)
   (if (not (string= string ""))
-      (rmoo-history-insert rmoo-input-history string)))
+    (progn
+      (rmoo-history-insert rmoo-input-history string)
+      (rmoo-append-to-logfile (concat rmoo-prompt string)))))
 
 (defun rmoo-previous-command ()
   (interactive)
@@ -488,6 +497,10 @@ Keymap:
 (defun rmoo-request-tls-maybe (world)
   (or (get world 'tls)
       (read-string "TLS/SSL? ")))
+
+(defun rmoo-request-logfile-maybe (world)
+  (or (get world 'logfile)
+      (read-string "Log File Path: ")))
 
 (defun rmoo-request-login-maybe (world)
   (or (get world 'login)
@@ -680,6 +693,15 @@ on the last line of the buffer.")
 (defun rmoo-upload-buffer-directly ()
   (interactive)
   (rmoo-send-here (buffer-string)))
+
+(defun rmoo-append-to-logfile (log-text)
+  "Appends text to the log file.\nIf no log file is specifed (nil), nothing happens. That's about the extend of the safety checks, so hopefully the path is valid!"
+  (interactive)
+  (if rmoo-logfile
+  ;; We put a -1 for visit to inhibit the 'Wrote filename' messages entry every time
+  (write-region (concat log-text "\n") nil rmoo-logfile 'append 0)))
+
+(add-to-list 'rmoo-handle-text-redirect-functions 'rmoo-append-to-logfile)
 
 ;;
 ;; Thrown in for old times sake..
