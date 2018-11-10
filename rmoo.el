@@ -234,6 +234,8 @@ Keymap:
 				 (get rmoo-world-here 'process)))))
 	(insert-before-markers (concat line "\n"))
 	(save-restriction
+      (narrow-to-region start (point))
+	  (goto-char start)
 	  (run-hooks 'rmoo-handle-text-hooks)
 	  (rmoo-recenter))))))
 
@@ -645,8 +647,9 @@ on the last line of the buffer.")
 (defun rmoo-recenter ()
   "If we should recenter, recenter."
   (if (and (eq (current-buffer) (process-buffer proc))
-	   (eq scroll-step 1))
-      (recenter -1)))
+		   (eq scroll-step 1)
+		   (= (point) (point-max)))
+	(recenter -1)))
 
 (defun rmoo-string-to-list (string)
   (let ((list nil))
