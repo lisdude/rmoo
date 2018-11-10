@@ -525,7 +525,8 @@ Keymap:
 	"rmoo-mail"
 	"rmoo-objects"
 	"rmoo-local-edit"
-	"rmoo-extras"))
+	"rmoo-extras"
+    "rmoo-scratch"))
 
 (defvar rmoo-x-libraries
       (list
