@@ -1,6 +1,6 @@
 # RMOO Manual
 
-The following documents how to get RMOO up and running for the complete beginner. If you're unfamiliar with emacs, the conventions used may be a bit odd. Here's a quick rundown of how commands are presented:
+The following documents how to get RMOO up and running for the complete beginner. If you're unfamiliar with Emacs, the conventions used may be a bit odd. Here's a quick rundown of how commands are presented:
 
 When prefixed with a C-, that means hold down CTRL and the letter following C-. e.g. `C-w` means hold down CTRL while pressing w.
 When prefixed with an M-, that means your meta key. Typically this is your Windows or Option key. e.g. `M-x` means to hold down meta while pressing x. (This will often be followed by a full string. M-x allows you to run commands by typing them in.)
@@ -59,7 +59,7 @@ Once you @edit a verb, the screen will split in half with your verb code on one 
 | `rmoo-quit`            | `C-c C-q`     | Disconnect from the current world.                                                                                                                                                                                  |
 | `rmoo-scratch`         | `C-c C-s`     | Open a scratch buffer. Anything you enter in this buffer will get sent directly to the MOO. This is useful for pasting in long scripts or using the @paste command. Like the code editor, you can send with `C-c s` |
 | `rmoo-@paste-kill`     | `C-c C-p`     | @paste whatever is in the 'kill ring'.                                                                                                                                                                              |
-| `rmoo-set-linelength`  | `C-c C-l`     | Automatically set @linelength based on the size of your emacs window.                                                                                                                                               |
+| `rmoo-set-linelength`  | `C-c C-l`     | Automatically set @linelength based on the size of your Emacs window.                                                                                                                                               |
 | `rmoo-clear-input`     | `M-backspace` | Delete the contents of the command line and, if scrolled up, jump back to the command line.                                                                                                                         |
 | `rmoo-up-command`      | `Up Arrow`    | Recall command history. Can also be summoned with `Esc-p`                                                                                                                                                           |
 | `rmoo-down-command`    | `Down Arrow`  | Same as up arrow, only opposite direction. Can also be summoned with `Esc-n`                                                                                                                                        |
@@ -68,7 +68,7 @@ Once you @edit a verb, the screen will split in half with your verb code on one 
 |                        |               |                                                                                                                                                                                                                     |
 
 ### Miscellaneous Settings
-These are some settings you can put in your general emacs settings to enhance your rmoo experience.
+These are some settings you can put in your general Emacs settings to enhance your rmoo experience.
 
 | Setting                                                   | Effect                                                                                                       |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
