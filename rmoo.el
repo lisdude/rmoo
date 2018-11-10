@@ -65,7 +65,7 @@
 	(put world 'process proc)
 	(or (get world 'output-function)
 	    (put world 'output-function 'rmoo-handle-text))
-	(process-kill-without-query proc t)
+	(process-query-on-exit-flag proc)
 	(if (and (not (string= login ""))
 		 rmoo-autologin)
 	    (rmoo-send-string (concat "connect "
