@@ -13,6 +13,7 @@
 (provide 'rmoo)
 (require 'cl)
 (require 'comint) ; All that's needed from comint is comint-read-noecho. 
+(require 'xterm-color)
 
 ;;
 ;; Most of the global variables.
@@ -134,7 +135,7 @@ Keymap:
 		  (setq rmoo-output (cdr rmoo-output))
 		  (while rmoo-output
 		    (set-buffer (process-buffer proc))
-		    (setq line (ansi-color-apply (car rmoo-output)))
+		    (setq line (xterm-color-filter (car rmoo-output)))
 		    (setq rmoo-output (cdr rmoo-output))
 		    (funcall (get rmoo-world-here 'output-function) line))))
 	      (if moving (goto-char (process-mark proc))))
