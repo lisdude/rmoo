@@ -41,6 +41,8 @@
     (define-key map "\^c\^w" 'rmoo-worlds-map)
     (define-key map [backspace] 'rmoo-backspace)
     (define-key map (kbd "C-c C-l") 'rmoo-set-linelength)
+    (define-key map (kbd "M-DEL") 'rmoo-clear-input)
+    (define-key map [home] 'rmoo-beginning-of-line)
     map)
   "Keymap for MOO Interactive Mode.")
 
@@ -667,12 +669,26 @@ on the last line of the buffer.")
   (interactive)
   (rmoo-send-here (car kill-ring)))
 
-(defun rmoo-beginning-of-line ()
-  "Move point to beginning-of-line, but after prompt character."
+(defun rmoo-up-command ()
+  "Moves point back to the input line and scrolls through history."
   (interactive)
-  (beginning-of-line 1)
-  (if (looking-at rmoo-prompt)
-      (forward-char (length rmoo-prompt))))
+  (goto-char (point-max))
+  (rmoo-previous-command))
+
+(defun rmoo-down-command ()
+  "Moves point back to the input line and scrolls through history."
+  (interactive)
+  (goto-char (point-max))
+  (rmoo-next-command))
+
+(defun rmoo-clear-input ()
+  "Jump to the input line and delete whatever is there."
+  (interactive)
+  (goto-char (point-max))
+  (rmoo-beginning-of-line)
+  (if (= scroll-step 1)
+      (recenter -1))
+  (delete-region (point) (progn (forward-line 1) (point))))
 
 (defun rmoo-quit ()
   "Quit MOO process."
