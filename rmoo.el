@@ -308,6 +308,7 @@ Keymap:
       (insert ";;\n;; MOO Worlds\n;;\n")
       (mapatoms 'rmoo-worlds-insert-world rmoo-worlds)
       (write-file file)
+      (set-file-modes file #o0600)
       (kill-buffer nil))))
 
 (defun rmoo-worlds-insert-world (world)
