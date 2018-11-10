@@ -40,6 +40,7 @@
     (define-key map "\^c\^y" 'rmoo-send-kill)
     (define-key map "\^c\^w" 'rmoo-worlds-map)
     (define-key map [backspace] 'rmoo-backspace)
+    (define-key map (kbd "C-c C-l") 'rmoo-set-linelength)
     map)
   "Keymap for MOO Interactive Mode.")
 
@@ -706,6 +707,11 @@ on the last line of the buffer.")
   (write-region (concat log-text "\n") nil rmoo-logfile 'append 0)))
 
 (add-to-list 'rmoo-handle-text-redirect-functions 'rmoo-append-to-logfile)
+
+(defun rmoo-set-linelength ()
+  "Send the size of the window to the @linelength command."
+  (interactive)
+  (rmoo-send-here (concat "@linelength " (number-to-string (- (window-total-width) 5)))))
 
 ;;
 ;; Thrown in for old times sake..
