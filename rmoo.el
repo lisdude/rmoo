@@ -37,6 +37,7 @@
     (define-key map "\^c\^q" 'rmoo-quit)
     (define-key map "\^c\^y" 'rmoo-send-kill)
     (define-key map "\^c\^w" 'rmoo-worlds-map)
+    (define-key map [backspace] 'rmoo-backspace)
     map)
   "Keymap for MOO Interactive Mode.")
 
@@ -534,6 +535,11 @@ Keymap:
 ;; Various utility functions:
 ;;
 ;;
+(defun rmoo-backspace ()
+  (interactive)
+  (if (/= (current-column) (length rmoo-prompt))
+      (delete-char -1)))
+
 (defun rmoo-send-string (string proc)
   "Send STRING as input to PROC"
   (comint-send-string proc (concat string "\n")))
