@@ -150,34 +150,42 @@
 			 object
 			 "\n")))
 
-(rmoo-mcp-register "cache-verb" nil t
+(rmoo-mcp-register "cache-verb" t
 		  '(("object" . 'required)
 		    ("verb" . 'required)
 		    ("owner" . 'required)
 		    ("perms" . 'required)
 		    ("full-name" . 'required))
 		  'rmoo-objects-cache-verb
-		  "cached-objects")
+		  "1.0"
+          "1.0"
+          nil)
 
-(rmoo-mcp-register "cache-property" nil t
+(rmoo-mcp-register "cache-property" t
 		  '(("object" . 'required)
 		    ("property" . 'required)
 		    ("owner" . 'required)
 		    ("perms" . 'required))
 		  'rmoo-objects-cache-property
-		  "cached-objects")
+		  "1.0"
+          "1.0"
+          nil)
 
-(rmoo-mcp-register "cache-parent" nil t
+(rmoo-mcp-register "cache-parent" t
 		  '(("object" . 'required)
 		    ("parent" . 'required))
 		  'rmoo-objects-cache-parent
-		  "cached-objects")
+		  "1.0"
+          "1.0"
+          nil)
 
-(rmoo-mcp-register "cache-object" nil t
+(rmoo-mcp-register "cache-object" t
 		  '(("object" . 'required)
 		    ("objnum" . 'required))
 		  'rmoo-objects-cache-object
-		  "cached-objects")
+		  "1.0"
+          "1.0"
+          nil)
 
 (defun rmoo-objects-cache-object (objname objnum)
   (let ((object (mo-intern objname rmoo-world-here)))

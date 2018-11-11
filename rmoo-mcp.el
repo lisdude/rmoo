@@ -1,45 +1,19 @@
 ;;
-;; mud-client protocol
+;; MUD Client Protocol 2.1
+;; (http://www.moo.mud.org/mcp2/mcp2.html)
 ;;
-;; Most of the code below is Erik's. I've inserted bits here and there
-;; to make it comapatible with rmoo.el.
-;; 
-;; I may have hacked on this a bit too much.
+;; Adapted from the original MCP 1.0 implementation by lisdude <lisdude@lisdude.com>
 ;;
-;; Besides a general replacement of mud with mud (my own whim) this file
-;; differs from j-mcp.el in only a few ways:
-;;
-;;    1. mud-mcp-start-edit     - changed it so that it knows about mud-worlds
-;;    2. mud-mcp-cleanup-edit-* - changed so they do the buffer thing and
-;;                                 display the window
-;;    3. added some functions that act as an interface between the code
-;;       in this file and the code in rmoo.el
-;;
-;; I suspect that 2. was wrong, but I was eager to get a working version.
-;; The right thing to do is build the user interface functions in another
-;; file on top of the basic mcp functions. Just about everywhere that I've
-;; added something moo.el specific, a hook would probably be appropriate.
-;; 
-;; -Ron
-;;
-;; Original Author: Ron Tapia
-;; $Author: mattcamp $
-;; $Date: 1999/11/24 19:20:22 $
-;; $Revision: 1.3 $
+;; Original Authors: Ron Tapia, Erik, mattcamp
 ;;
 (require 'rmoo)
 (provide 'rmoo-mcp)
 (provide 'mcp)
 
-
-;;(defvar rmoo-mcp-startup-hook rmoo-mode-hook)
-
 (defvar rmoo-mcp-regexp (concat "^#\\$#"
-			       "\\([^ :*\\\"]+\\)"         ; request-name
-			       "\\(\\*\\)?"                ; data-follows
-			       "\\( +\\([^ :\\\"]+\\)\\( \\|$\\)\\)?"
-					; authentication-key
-			       "\\( *\\(.*\\)\\)$"))       ; key-value pairs
+			       "\\([^ :*\\\"]+\\)"                          ; request-name
+			       "\\( +\\([^ :\\\"]+\\)\\( \\|$\\)\\)?"       ; authentication-key
+			       "\\( *\\(.*\\)\\)$"))                        ; key-value pairs
 
 (defvar rmoo-mcp-quoting-prefix "@@@"
   "Prepended to all data sent after an mcp command.
@@ -47,45 +21,54 @@ Must not contain any special regexp characters.")
 
 (defvar rmoo-mcp-incomplete nil)
 
+(defvar rmoo-status-text "Status"
+"The text currently appended to the status line.")
+
 (defvar rmoo-mcp-quoting-end "#$#END"
   "Signals end of mcp data.")
 
 (defvar rmoo-mcp-cleanup-function nil)
 
 (defun rmoo-mcp-init-connection ()
-  "Make up a new auth-key and send it; send client options."
+  "MCP negotiation. Send an authentication key, enumerate packages, and send a negotiation end message."
   (interactive)
   (make-local-variable 'rmoo-mcp-auth-key)
-  (setq rmoo-mcp-auth-key (prin1-to-string (random)))
+  (setq rmoo-mcp-auth-key (prin1-to-string (random 99999999999)))
   (let ((proc (get-buffer-process (current-buffer))))
-    (rmoo-send-string (concat "#$#authentication-key " rmoo-mcp-auth-key) proc)
-    (rmoo-send-string (apply 'concat
-			    "#$#client-options"
-			    (mapcar (function
-				     (lambda (feature)
-				       (concat " " feature)))
-				    rmoo-mcp-features-list)) proc)))
+    (rmoo-send-string (concat "#$#mcp authentication-key: " rmoo-mcp-auth-key " version: 2.1 to: 2.1") proc)))
+  ;;  (rmoo-send-string (concat "#$#mcp-negotiate-can " rmoo-mcp-auth-key " package: \"mcp-negotiate\" min-version: \"1.0\" max-version: \"2.0\"") proc)
+   ;; (loop for x in rmoo-mcp-request-table
+  ;;        do (rmoo-send-string (concat "#$#mcp-negotiate-can " rmoo-mcp-auth-key " package: \"" (nth 0 x) "\" min-version: \"1.0\" max-version: \"2.0\"") proc))
+;;    (rmoo-send-string (concat "#$#mcp-negotiate-end " rmoo-mcp-auth-key) proc))
+;;    (loop for x in rmoo-mcp-request-table
+;;          do (progn
+ ;;              (if (rmoo-mcp-init-function x)
+   ;;              (funcall (rmoo-mcp-init-function x) proc)))))
 
-(defun rmoo-mcp-dispatch (request-name data-follows auth-key keyval-string)
+(defun rmoo-mcp-dispatch (request-name auth-key keyval-string)
   "Figure out if we know what to do with the given request;
 check the auth-key if it's important;
 check that we have all the args we want;
 if data-follows, start gathering it."
-  (setq fooo (list request-name data-follows auth-key keyval-string))
-  (let ((entry (assoc (cons request-name data-follows) rmoo-mcp-request-table)))
+(message (concat "<< MCP Dispatch >> request: " request-name " auth-key: " auth-key " keyval-string: " keyval-string))
+  (setq fooo (list request-name auth-key keyval-string))
+  (let ((entry (assoc request-name rmoo-mcp-request-table)))
     (if entry
-	(if (and (rmoo-mcp-need-auth-key entry)
-		 (not (equal auth-key rmoo-mcp-auth-key)))
+	(if (not (equal auth-key rmoo-mcp-auth-key))
 	    (error "Illegal authentication key in %s" (buffer-name))
 	  (let ((arglist (rmoo-mcp-arglist entry keyval-string)))
 	    (if (listp arglist)
 		(apply (rmoo-mcp-setup-function entry) arglist)
-	      (rmoo-mcp-handle-unknown data-follows))))
-      (rmoo-mcp-handle-unknown data-follows))))
+	      (rmoo-mcp-handle-unknown keyval-string))))
+      (rmoo-mcp-handle-unknown keyval-string))))
 
 (defun rmoo-mcp-setup-function (entry)
   "What function do we call to deal with this entry in the table?"
   (nth 2 (cdr entry)))
+
+(defun rmoo-mcp-init-function (entry)
+  "What function do we call to initialize this package after confirming negotiation?"
+  (nth 6 entry))
 
 (defun rmoo-mcp-handle-unknown (data-follows)
   (if data-follows
@@ -141,19 +124,14 @@ if data-follows, start gathering it."
 			   arglist))
 	  (throw 'rmoo-mcp-failed-parse 'rmoo-mcp-failed-parse)))
       arglist)))
-				
+
 (defvar rmoo-mcp-request-table '()
   "Alist of information about known request types, keyed by string.")
 
-(defvar rmoo-mcp-features-list '()
-  "List of client features to tell the server about.")
-
-(defun rmoo-mcp-register (request-name data-follows auth-key keys
-				      setup-function &optional family)
+(defun rmoo-mcp-register (package-name auth-key keys
+				      setup-function min-version max-version init-function)
   "Register a new mcp request type.
-REQUEST-NAME is the name of the request type, e.g. \"edit\".
-DATA-FOLLOWS is t if the MOO is expected to provide lines of data.
-If you want a request to be able to handle both forms, set them up separately.
+PACKAGE-NAME is the full, official name of the MCP package.
 AUTH-KEY is t if this request type needs an authentication key to work.
 KEYS is an alist of pairs (key . default-value).
   The key must be a string.
@@ -161,20 +139,18 @@ KEYS is an alist of pairs (key . default-value).
 that the request must supply a value.
 SETUP-FUNCTION is a symbol for the function that gets called to set up
 request-specific details.
-FAMILY determines the family of client features this lives in; default is
-the name of the request, but some requests can be grouped together."
-  (let* ((key (cons request-name data-follows))
-	 (value (list auth-key keys setup-function))
+MIN-VERSION is the minimum version of the MCP package supported.
+MAX-VERSION is the maximum version of the MCP package supported.
+INIT-FUNCTION is a symbol for the function that gets called immediately after negotiation is complete."
+(message (concat "<< MCP >> Registering " package-name))
+  (let* ((key package-name)
+	 (value (list auth-key keys setup-function min-version max-version init-function))
 	 (entry (assoc key rmoo-mcp-request-table)))
     (if entry
 	(setcdr entry value)
       (progn
 	(setq rmoo-mcp-request-table (cons (cons key value)
-					  rmoo-mcp-request-table)
-	      family (or family request-name))
-	(if (not (member family rmoo-mcp-features-list))
-	    (setq rmoo-mcp-features-list
-		  (cons family rmoo-mcp-features-list)))))))
+					  rmoo-mcp-request-table))))))
 
 (defun rmoo-mcp-need-auth-key (entry)
   "Does this entry in the table need an authentication key?"
@@ -190,17 +166,19 @@ the name of the request, but some requests can be grouped together."
   (setq rmoo-state 'unquoting
 	rmoo-current-process (get-buffer-process (current-buffer))
 	rmoo-buffer buffer))
-  
-(rmoo-mcp-register "edit" t nil
+
+(rmoo-mcp-register "dns-org-mud-moo-simpleedit" nil
 		  '(("type" . "text")
 		    ("name" . 'required)
 		    ("upload" . 'required))
 		  'rmoo-mcp-start-edit
-		  "mcp_edit")
+		  "1.0"
+          "1.0"
+          nil)
 
 ;;
 ;; What have I done here? Basically, I've told rmoo-mcp-start-edit
-;; about rmoo-worlds. 
+;; about rmoo-worlds.
 ;;
 (defun rmoo-mcp-start-edit (type name upload)
   (let ((buf (current-buffer))
@@ -284,107 +262,63 @@ the name of the request, but some requests can be grouped together."
     (setq rmoo-world-here world)))
 
 ;;
-;; The functions that don't have data following are easily handled, they 
+;; The functions that don't have data following are easily handled, they
 ;; didn't require any modification. But see the mods to the general
 ;; mcp stuff...
 ;;
+;; Kind of cheat a little with negotiation and register each message as an individual package.
+;; That way they get appropriately detected and handled without a separate regex or effort.
 ;;
-(rmoo-mcp-register "ftp" nil t
-		  '(("host" . 'required)
-		    ("directory" . 'required)
-		    ("file" . 'required)
-		    ("type" . 'required)
-		    ("destination" . 'required))
-		  'rmoo-mcp-do-ftp)
+(rmoo-mcp-register "mcp-negotiate" t '() nil "1.0" "2.0" nil)
 
-(defun rmoo-mcp-do-ftp (host directory file type destination)
+(rmoo-mcp-register "mcp-negotiate-can" t
+                   `(("package" . 'required)
+                     ("min-version" . 'required)
+                     ("max-version" . 'required))
+                   'rmoo-mcp-do-negotiation
+                   "1.0"
+                   "2.0"
+                   nil)
+
+(defun rmoo-mcp-do-negotiation (package-name min-version max-version)
+  "When the server tells us it supports a package, check if we also support it and send along a negotiation response."
+  (let ((entry (assoc package-name rmoo-mcp-request-table)))
+    (if entry (progn
+        (rmoo-send-string (concat "#$#mcp-negotiate-can " rmoo-mcp-auth-key " package: \"" (nth 0 entry) "\" min-version: \"" (nth 4 entry) "\" max-version: \"" (nth 5 entry) "\"") proc)
+        (if (rmoo-mcp-init-function entry)
+           (funcall (rmoo-mcp-init-function entry) proc))))))
+
+(rmoo-mcp-register "mcp-negotiate-end" t '() 'rmoo-mcp-end-negotiation "1.0" "2.0" nil)
+
+(defun rmoo-mcp-end-negotiation ()
+  "When the server is done negotiating, confirm that we are too."
+    (rmoo-send-string (concat "#$#mcp-negotiate-end " rmoo-mcp-auth-key) proc))
+
+(rmoo-mcp-register "dns-com-awns-status" t
+		  '(("text" . 'required))
+		  'rmoo-mcp-do-status
+          "1.0"
+          "1.0"
+          nil)
+
+(defun rmoo-mcp-do-status (text)
   (rmoo-mcp-remove-line)
-  (call-process "fetch-file" nil 0 nil
-		host dir file type dest))
+  (delete rmoo-status-text mode-line-misc-info)
+  (add-to-list 'mode-line-misc-info text 'APPEND)
+  (setq rmoo-status-text text))
 
-(rmoo-mcp-register "gopher" nil t
-		  '(("host" . 'required)
-		    ("port" . "70")
-		    ("path" . "")
-		    ("description" . "1"))
-		  'rmoo-mcp-do-gopher)
+(rmoo-mcp-register "dns-com-vmoo-client" t '() 'rmoo-mcp-do-client "1.0" "1.0" 'rmoo-mcp-initialize-client)
 
-(defvar rmoo-mcp-gopher-buffer nil
-  "Buffer to place gopher stuff in.")
-
-(defun rmoo-mcp-do-gopher (host port path description)
-  (if (not (fboundp 'gopher-set-object-host))
-      (load-library "gopher"))  ; gross hack to get around lack of provide
-  (rmoo-mcp-remove-line)
-  (let ((here (current-buffer)))
-    (gopher-set-object-host gopher-root-node host)
-    (setq port (car (read-from-string port)))
-    (gopher-set-object-port gopher-root-node port)
-    (gopher-dispatch-object
-     (vector (aref description 0)
-	     (substring description 1)
-	     path
-	     host
-	     port)
-     rmoo-mcp-gopher-buffer)
-    (cond ((not (equal here (current-buffer)))
-	   (setq rmoo-mcp-gopher-buffer (current-buffer))
-	   (setq rmoo-select-buffer rmoo-mcp-gopher-buffer)
-	   (set-buffer here)))))
-  
-(rmoo-mcp-register "display-url" nil t
-		  '(("url" . 'required)
-		    ("command" . 'required))
-		  'rmoo-mcp-do-url
-		  "urls")
-
-(defun rmoo-mcp-www-buffer (world)
-  (let ((buffers (get world 'rmoo-mcp-www-buffers)))
-    (while (and buffers (not (buffer-name (car buffers))))
-      (setq buffers (cdr buffers)))
-    (put world 'rmoo-mcp-www-buffers buffers)
-    (if buffers (car buffers))))
-
-(defun rmoo-mcp-do-url (url command)
-  (require 'w3)
-  (if (not w3-setup-done) (w3-do-setup))
-;  (rmoo-mcp-remove-line)
-  (let* ((w3-be-asynchronous nil)
-	 (buf (current-buffer))
-	 (newname (concat "*W3 for " (rmoo-name rmoo-world-here) "*"))
-	 (here rmoo-world-here)
-	 (switchback (get-buffer-window buf))
-	 (oldbuf (if (equal command "goto")
-		     (rmoo-mcp-www-buffer rmoo-world-here)))
-	 (oldwin (if oldbuf (get-buffer-window oldbuf))))
-;;    (w3-retrieve url)
-;;; new stuff
-    (url-retrieve url)
-    (set-buffer url-working-buffer)
-    (setq w3-working-buffer url-working-buffer)
-;;; end new stuff
-    (w3-prepare-buffer t)
-    (set-buffer buf)
-    (if oldwin
-	(progn
-	  (select-window oldwin)
-	  (switch-to-buffer w3-working-buffer))
-      (switch-to-buffer-other-window w3-working-buffer))
-    (w3-mode)
-    (setq w3-current-last-buffer oldbuf)
-    (rename-buffer newname t)
-    (put here 'rmoo-mcp-www-buffers (cons (current-buffer)
-					 (get here 'rmoo-mcp-www-buffers)))
-    (if switchback (switch-to-buffer-other-window buf))))
+(defun rmoo-mcp-initialize-client (proc)
+  (rmoo-send-string (concat "#$#dns-com-vmoo-client-info " rmoo-mcp-auth-key " name: \"RMOO (Emacs)\" text-version: \"1.2\" internal-version: \"1.2\"") proc))
 
 (defun rmoo-mcp-redirect-function (line)
-  (when (equal line "#$#mcp version: 1.0")
+  (when (string-match "^#$#mcp version: [0-9]\.[0-9] to: [0-9]\.[0-9]$" line)
     (rmoo-mcp-init-connection))
   (cond ((eq (string-match rmoo-mcp-regexp line) 0)
 	 (rmoo-mcp-dispatch (rmoo-match-string 1 line)
-			   (if (match-beginning 2) t nil)
-			   (if (match-beginning 4)
-			       (rmoo-match-string 4 line)
+			   (if (match-beginning 3)
+			       (rmoo-match-string 3 line)
 			     nil)
 			   (rmoo-match-string 6 line))
 	 'rmoo-mcp-nil-function)
