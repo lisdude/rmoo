@@ -39,7 +39,7 @@
 
 (defun rmoo-mcp-dispatch (request-name auth-key keyval-string)
   "Figure out if we know what to do with the given request;
-  check the auth-key if it's important;
+  check the auth-key;
   check that we have all the args we want;
   if data-follows, start gathering it."
   (setq fooo (list request-name auth-key keyval-string))
@@ -55,11 +55,11 @@
 
 (defun rmoo-mcp-setup-function (entry)
   "What function do we call to deal with this entry in the table?"
-  (nth 2 (cdr entry)))
+  (nth 2 entry))
 
 (defun rmoo-mcp-init-function (entry)
   "What function do we call to initialize this package after confirming negotiation?"
-  (nth 6 entry))
+  (nth 5 entry))
 
 (defun rmoo-mcp-handle-unknown (data-follows)
   (if data-follows
@@ -88,7 +88,7 @@
                             (cdr template))
                            (t
                              (throw 'rmoo-mcp-missing-arg 'rmoo-mcp-missing-arg))))))
-               (nth 1 (cdr (setq barr entry))))))))
+               (nth 0 (cdr (setq barr entry))))))))
 
 (defvar rmoo-mcp-keyval-regexp (concat "\\([^ \\\":]+\\): +"
                                        "\\([^ \\\"]+\\|"
@@ -119,11 +119,9 @@
 (defvar rmoo-mcp-request-table '()
   "Alist of information about known request types, keyed by string.")
 
-(defun rmoo-mcp-register (package-name auth-key keys
-                                       setup-function min-version max-version init-function)
+(defun rmoo-mcp-register (package-name keys setup-function min-version max-version init-function)
   "Register a new mcp request type.
 PACKAGE-NAME is the full, official name of the MCP package.
-AUTH-KEY is t if this request type needs an authentication key to work.
 KEYS is an alist of pairs (key . default-value).
 The key must be a string.
 The default-value must be a string, or the symbol 'required, which means
@@ -134,17 +132,13 @@ MIN-VERSION is the minimum version of the MCP package supported.
 MAX-VERSION is the maximum version of the MCP package supported.
 INIT-FUNCTION is a symbol for the function that gets called immediately after negotiation is complete."
 (let* ((key package-name)
-       (value (list auth-key keys setup-function min-version max-version init-function))
+       (value (list keys setup-function min-version max-version init-function))
        (entry (assoc key rmoo-mcp-request-table)))
   (if entry
     (setcdr entry value)
     (progn
       (setq rmoo-mcp-request-table (cons (cons key value)
                                          rmoo-mcp-request-table))))))
-
-(defun rmoo-mcp-need-auth-key (entry)
-  "Does this entry in the table need an authentication key?"
-  (car (cdr entry)))
 
 (defun rmoo-mcp-remove-line ()
   (let ((start (progn (rmoo-beginning-of-line) (point))))
@@ -157,7 +151,7 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
         rmoo-current-process (get-buffer-process (current-buffer))
         rmoo-buffer buffer))
 
-(rmoo-mcp-register "dns-org-mud-moo-simpleedit" nil
+(rmoo-mcp-register "dns-org-mud-moo-simpleedit"
                    '(("type" . "text")
                      ("name" . 'required)
                      ("upload" . 'required))
@@ -259,9 +253,9 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
 ;; Kind of cheat a little with negotiation and register each message as an individual package.
 ;; That way they get appropriately detected and handled without a separate regex or effort.
 ;;
-(rmoo-mcp-register "mcp-negotiate" t '() nil "1.0" "2.0" nil)
+(rmoo-mcp-register "mcp-negotiate" '() nil "1.0" "2.0" nil)
 
-(rmoo-mcp-register "mcp-negotiate-can" t
+(rmoo-mcp-register "mcp-negotiate-can"
                    `(("package" . 'required)
                      ("min-version" . 'required)
                      ("max-version" . 'required))
@@ -274,17 +268,17 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   "When the server tells us it supports a package, check if we also support it and send along a negotiation response."
   (let ((entry (assoc package-name rmoo-mcp-request-table)))
     (if entry (progn
-                (rmoo-send-string (concat "#$#mcp-negotiate-can " rmoo-mcp-auth-key " package: \"" (nth 0 entry) "\" min-version: \"" (nth 4 entry) "\" max-version: \"" (nth 5 entry) "\"") proc)
+                (rmoo-send-string (concat "#$#mcp-negotiate-can " rmoo-mcp-auth-key " package: \"" (nth 0 entry) "\" min-version: \"" (nth 3 entry) "\" max-version: \"" (nth 4 entry) "\"") proc)
                 (if (rmoo-mcp-init-function entry)
                   (funcall (rmoo-mcp-init-function entry) proc))))))
 
-(rmoo-mcp-register "mcp-negotiate-end" t '() 'rmoo-mcp-end-negotiation "1.0" "2.0" nil)
+(rmoo-mcp-register "mcp-negotiate-end" '() 'rmoo-mcp-end-negotiation "1.0" "2.0" nil)
 
 (defun rmoo-mcp-end-negotiation ()
   "When the server is done negotiating, confirm that we are too."
   (rmoo-send-string (concat "#$#mcp-negotiate-end " rmoo-mcp-auth-key) proc))
 
-(rmoo-mcp-register "dns-com-awns-status" t
+(rmoo-mcp-register "dns-com-awns-status"
                    '(("text" . 'required))
                    'rmoo-mcp-do-status
                    "1.0"
@@ -297,7 +291,7 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   (add-to-list 'mode-line-misc-info text 'APPEND)
   (setq rmoo-status-text text))
 
-(rmoo-mcp-register "dns-com-vmoo-client" t '() 'rmoo-mcp-do-client "1.0" "1.0" 'rmoo-mcp-initialize-client)
+(rmoo-mcp-register "dns-com-vmoo-client" '() 'rmoo-mcp-do-client "1.0" "1.0" 'rmoo-mcp-initialize-client)
 
 (defun rmoo-mcp-initialize-client (proc)
   (rmoo-send-string (concat "#$#dns-com-vmoo-client-info " rmoo-mcp-auth-key " name: \"RMOO (Emacs)\" text-version: \"1.2\" internal-version: \"1.2\"") proc))

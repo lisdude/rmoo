@@ -150,7 +150,7 @@
 			 object
 			 "\n")))
 
-(rmoo-mcp-register "cache-verb" t
+(rmoo-mcp-register "cache-verb"
 		  '(("object" . 'required)
 		    ("verb" . 'required)
 		    ("owner" . 'required)
@@ -161,7 +161,7 @@
           "1.0"
           nil)
 
-(rmoo-mcp-register "cache-property" t
+(rmoo-mcp-register "cache-property"
 		  '(("object" . 'required)
 		    ("property" . 'required)
 		    ("owner" . 'required)
@@ -171,7 +171,7 @@
           "1.0"
           nil)
 
-(rmoo-mcp-register "cache-parent" t
+(rmoo-mcp-register "cache-parent"
 		  '(("object" . 'required)
 		    ("parent" . 'required))
 		  'rmoo-objects-cache-parent
@@ -179,7 +179,7 @@
           "1.0"
           nil)
 
-(rmoo-mcp-register "cache-object" t
+(rmoo-mcp-register "cache-object"
 		  '(("object" . 'required)
 		    ("objnum" . 'required))
 		  'rmoo-objects-cache-object

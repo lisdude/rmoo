@@ -120,21 +120,21 @@ Commands:
 ;;
 ;; Register the request types
 ;;
-(rmoo-mcp-register "display-mail-lists" t
+(rmoo-mcp-register "display-mail-lists"
 		  '()
 		  'rmoo-rmail-display-lists
 		  "1.0"
           "1.0"
           nil) 
 
-(rmoo-mcp-register "display-mail-summary" t
+(rmoo-mcp-register "display-mail-summary"
 		  '(("list" . 'required))
 		  'rmoo-rmail-display-summary
 		  "1.0"
           "1.0"
           nil)
 
-(rmoo-mcp-register "display-mail-message" t
+(rmoo-mcp-register "display-mail-message"
 		  '(("list" . 'required)
 		    ("message-number" . 'required))
 		  'rmoo-rmail-display-message
