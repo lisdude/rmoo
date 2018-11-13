@@ -58,8 +58,8 @@
         (let ((arglist (rmoo-mcp-arglist entry keyval-string)))
           (if (listp arglist)
             (apply (rmoo-mcp-setup-function entry) arglist)
-            (rmoo-mcp-handle-unknown keyval-string))))
-      (rmoo-mcp-handle-unknown keyval-string))))
+            (rmoo-mcp-handle-unknown request-name keyval-string))))
+      (rmoo-mcp-handle-unknown request-name keyval-string))))
 
 (defun rmoo-mcp-setup-function (entry)
   "What function do we call to deal with this entry in the table?"
@@ -69,7 +69,7 @@
   "What function do we call to initialize this package after confirming negotiation?"
   (nth 5 entry))
 
-(defun rmoo-mcp-handle-unknown (data-follows)
+(defun rmoo-mcp-handle-unknown (request data-follows)
   (if data-follows
     (let* ((start (point))
            (line (progn
@@ -78,6 +78,7 @@
       (let ((buf (current-buffer)))
         (set-buffer (rmoo-mcp-setup-data (generate-new-buffer
                                            "Unknown data")))
+        (insert (concat "Request name: " request))
         (insert line)
         (set-buffer buf)))
     (rmoo-mcp-remove-line)))
@@ -311,8 +312,8 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   (rmoo-send-string (concat "#$#dns-com-vmoo-client-info " rmoo-mcp-auth-key " name: \"RMOO (Emacs)\" text-version: \"1.2\" internal-version: \"1.2\"") proc))
 
 (defun rmoo-mcp-redirect-function (line)
-  (when (string-match "^#$#mcp version: [0-9]\.[0-9] to: [0-9]\.[0-9]$" line)
-    (rmoo-mcp-init-connection))
+  (if (string-match "^#$#mcp version: [0-9]\.[0-9] to: [0-9]\.[0-9]$" line)
+    (rmoo-mcp-init-connection)
   (cond ((eq (string-match rmoo-mcp-regexp line) 0)
          (rmoo-mcp-dispatch (rmoo-match-string 1 line)
                             (if (match-beginning 3)
@@ -320,7 +321,7 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
                               nil)
                             (rmoo-match-string 6 line))
          'rmoo-mcp-nil-function)
-        (t nil)))
+        (t nil))))
 
 (defun rmoo-mcp-nil-function (line) "Okay, this is a kludge")
 
