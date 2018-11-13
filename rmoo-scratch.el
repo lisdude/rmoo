@@ -37,7 +37,7 @@
     (rmoo-scratch-mode)
     (goto-char (point-min))
     (insert-before-markers (concat command "\n\n."))
-    (forward-line)
+    (backward-char 2)
     (if rmoo-scratch-use-new-frame
       (make-frame)
       (switch-to-buffer-other-window (current-buffer)))))
