@@ -18,6 +18,7 @@
 ;;
 ;; Most of the global variables.
 ;;
+(defvar rmoo-version "1.2")
 (defvar rmoo-world-here nil "The moo world associated with this buffer.")
 (make-variable-buffer-local 'rmoo-world-here)
 (defvar rmoo-prompt ">" "The prompt to use for this moo.\nTaken from the prompt property of a moo world.")
