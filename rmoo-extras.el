@@ -3,9 +3,7 @@
 ;; Extras that really don't belong anywhere else.
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcamp $
-;; $Date: 1999/03/02 00:05:04 $
-;; $Revision
+;; Revised by: mattcamp
 ;;
 
 (require 'rmoo)
@@ -25,8 +23,8 @@
 (defun rmoo-extras-get-verb (verb)
   (interactive (progn
 		  (setq rmoo-objects-current-moo rmoo-world-here)
-		  (list (completing-read 
-			 "Verb: " 
+		  (list (completing-read
+			 "Verb: "
 			 'rmoo-objects-verb-completion-function))))
     (comint-send-string nil (concat rmoo-extras-verb-edit-command " " verb "\n")))
 
@@ -75,8 +73,3 @@ If you're lucky, it may even display the verb code in a Text Mode buffer."
 ;;(defvar rmoo-extras-jtext-edit-command "" "Command to use to get a jtext property.")
 ;;(make-variable-buffer-local 'rmoo-extras-jtext-edit-command)
 ;;(make-variable-buffer-local 'rmoo-extras-text-edit-command)
-
-;; $Log: rmoo-extras.el,v $
-;; Revision 1.1  1999/03/02 00:05:04  mattcamp
-;; Initial revision
-;;

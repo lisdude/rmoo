@@ -3,9 +3,7 @@
 ;; Some code to interact with Lambdastyle local editing.
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcamp $
-;; $Date: 1999/11/24 19:21:46 $
-;; $Revision: 1.3 $
+;; Revised by: mattcamp
 
 (require 'rmoo)
 (require 'rmoo-mcp)
@@ -38,7 +36,7 @@
 	 'rmoo-mcp-nil-function)
 	(t
 	 nil)))
-  
+
 (defun rmoo-local-edit-output-function (line)
   (cond ((eq (string-match "^\\.$" line) 0)
 	 (set-buffer (get rmoo-world-here 'output-buffer))
@@ -58,15 +56,3 @@
     (goto-char (point-min))
     (put rmoo-world-here 'goto-function 'switch-to-buffer-other-window)
     (put rmoo-world-here 'goto-buffer (current-buffer))))
-	       
-;;
-;; $Log: rmoo-local-edit.el,v $
-;; Revision 1.3  1999/11/24 19:21:46  mattcamp
-;; Now requires rmoo-mcp, so it will byte-compile successfully.
-;;
-;; Revision 1.2  1999/03/02 00:10:09  mattcamp
-;; Removed the word "stoopid" from the comment at the top.
-;;
-;; Revision 1.1  1999/03/02 00:09:29  mattcamp
-;; Initial revision
-;;

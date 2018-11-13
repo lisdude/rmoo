@@ -1,14 +1,8 @@
 ;;; rmoo.el --- a major mode for interacting with MOOs.
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcampbell $
-;; $Date: 2000/10/18 21:33:39 $
-;; $Revision: 1.12 $
-;;
-;; Pre-RCS modifications by Matthew Campbell <mattcampbell@pobox.com>:
-;; Fixed a bug in rmoo-handle-text that prevented rmoo-handle-text-hooks
-;; from being run correctly.  Also modified rmoo-quit to provide reasonable
-;; feedback after the user confirms his choice to disconnect.
+;;                  Matthew Campbell <mattcampbell@pobox.com>
+;;                  lisdude <lisdude@lisdude.com>
 ;;
 (provide 'rmoo)
 (require 'cl)
@@ -749,45 +743,3 @@ on the last line of the buffer.")
   (interactive)
   (rmoo-upload-buffer-directly)
   (rmoo-destroy))
-
-;;
-;; $Log: rmoo.el,v $
-;; Revision 1.12  2000/10/18 21:33:39  mattcampbell
-;; Updated my email address.
-;;
-;; Revision 1.11  1999/11/24 19:32:36  mattcamp
-;; Moved declaration of rmoo-setup-done to avoid compiler warning.
-;;
-;; Revision 1.10  1999/08/17 12:31:16  mattcamp
-;; Fixed a typo in the handling of raw IP addresses (changed 'buff' to 'buf').
-;;
-;; Revision 1.9  1999/07/17 19:25:40  mattcamp
-;; Now all of the RMOO setup code runs when the rmoo function runs (if
-;; the newly added rmoo-setup-done variable is nil), and rmoo-x-libraries
-;; is now defined wiht a defvar rather than a setq function.
-;;
-;; Revision 1.8  1999/06/13 02:19:23  mattcamp
-;; Integrated RMOO setup (the loading of extra libraries and the worlds file), which was formerly placed in the user's .emacs file, into this file, so users don't have to add the large code block to their .emacs files anymore.
-;;
-;; Revision 1.7  1999/05/28 01:18:15  mattcamp
-;; Added new variable, rmoo-send-require-last-line, which when turned on causes rmoo-send to refuse to send anywhere else than the last line of the buffer.  Also modified rmoo-send to handle this.
-;;
-;; Revision 1.6  1999/05/27 00:37:35  mattcamp
-;; I also forgot to make the rmoo-destroy function interactive, so I fixed that.
-;;
-;; Revision 1.5  1999/05/27 00:18:22  mattcamp
-;; Added rmoo-destroy function for destroying a buffer and window without uploading.
-;;
-;; Revision 1.4  1999/05/27 00:13:22  mattcamp
-;; Forgot to make rmoo-upload-and-destroy interactive, so I fixed that.
-;;
-;; Revision 1.3  1999/05/26 23:38:08  mattcamp
-;; Added function rmoo-upload-and-destroy to upload a buffer, kill the buffer, and delete the window.
-;;
-;; Revision 1.2  1999/05/24 01:23:41  mattcamp
-;; Added rmoo-send-always-goto-end option to make RMOO always go to the end
-;; of a buffer after sending.
-;;
-;; Revision 1.1  1999/03/02 00:23:09  mattcamp
-;; Initial revision
-;;

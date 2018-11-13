@@ -6,9 +6,6 @@
 ;; This is free software, covered by the GNU General Public License.
 ;;
 ;; Original Author: Matthew Campbell <mattcampbell@pobox.com>
-;; $Author: mattcampbell $
-;; $Date: 2000/10/18 21:32:22 $
-;; $Revision: 1.10 $
 ;;
 
 (require 'rmoo)
@@ -91,50 +88,3 @@ the emacspeak-rmoo module."
   "Play an appropriate auditory icon and sync Emacspeak and the synthesizer."
   (emacspeak-auditory-icon 'moo-login)
   (emacspeak-dtk-sync))
-
-;;
-;; $Log: emacspeak-rmoo.el,v $
-;; Revision 1.10  2000/10/18 21:32:22  mattcampbell
-;; Updated my email address and changed the copyright notice.
-;;
-;; Revision 1.9  2000/10/16 22:14:41  mattcamp
-;; Removed the activity alert that happens when the user is typing; this caused problems for Emacs 20.5 and later.
-;;
-;; Revision 1.8  2000/01/15 20:36:05  mattcamp
-;; Added support for special MOO sounds, including a quick hack to notify the user via an auditory icon if new text arrives from the MOO while he's typing in that MOO buffer.
-;;
-;; Revision 1.7  1999/10/30 01:09:47  mattcamp
-;; Moved requires for emacspeak modules into a condition-case, as in w3-speak, so that this module will compile when emacspeak isn't loaded.
-;;
-;; Revision 1.6  1999/07/18 00:10:58  mattcamp
-;; Added an advice form for the rmoo function to provide an appropriate
-;; auditory icon and sync Emacspeak with the synthesizer.  Also removed
-;; the line to load the buff-menu library and replaced the many advice
-;; forms on buffer-related functions with a single advice form for
-;; emacspeak-speak-mode-line, to make sure that emacspeak-rmoo-catchup is
-;; called wherever it makes sense to call it.
-;;
-;; Revision 1.5  1999/03/21 14:33:05  mattcamp
-;; Replaced the algorithm for determining whether a user should be notified
-;; of activity in a MOO buffer with something that is more reliable and
-;; makes more sense.
-;;
-;; Revision 1.4  1999/03/20 19:43:32  mattcamp
-;; Took a little advice from the Emacspeak code (pun completely intended)
-;; and fixed the advice forms to act only when the functions are called
-;; interactively, then added advice for the functions that open buffers
-;; selected from the buffer menu.  Now the system should consistently
-;; read missed activity in a MOO buffer when the user switches to that
-;; buffer.
-;;
-;; Revision 1.3  1999/03/20 17:31:59  mattcamp
-;; Simplified the code that sets the emacspeak-rmoo-unheard-output-start
-;; and emacspeak-rmoo-unheard-output-end variables.
-;;
-;; Revision 1.2  1999/03/07 04:18:29  mattcamp
-;; Fixed bug in advice definitions that was causing some of
-;; emacspeak's advice forms to be overwritten.
-;;
-;; Revision 1.1  1999/03/01 23:01:02  mattcamp
-;; Initial revision
-;;

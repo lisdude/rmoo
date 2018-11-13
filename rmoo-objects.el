@@ -4,7 +4,7 @@
 ;; `hot' objects.
 ;;
 ;; This file gives MOO worlds new properties:
-;; 
+;;
 ;;       objects - an obarray
 ;;       objects-file - a file in which to save hot objects
 ;;
@@ -23,9 +23,7 @@
 ;; mo-<moo world name><objnum>
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcamp $
-;; $Date: 1999/11/24 19:31:58 $
-;; $Revision: 1.2 $
+;; Revised by: mattcamp
 
 (require 'rmoo)
 (require 'rmoo-mcp)
@@ -64,7 +62,7 @@
 ;; This needs to be rewritten...but it works for now.
 ;; In particular, I'm just ignoring predicate for now.
 ;;
-;; 
+;;
 ;;
 (defun rmoo-objects-verb-completion-function (string predicate flag)
   (rmoo-objects-completion-function ":" ":" 'verbs string predicate flag))
@@ -80,8 +78,8 @@
 	(setq c-func 'all-completions)
       (setq c-func 'try-completion))
     (if (eq index nil)
-	(progn (setq objstring string)       
-	       (setq verbstring "") 
+	(progn (setq objstring string)
+	       (setq verbstring "")
 	       (setq oc-func c-func))
       (setq objstring (substring string 0 index))
       (setq verbstring (substring string (+ index 1)))
@@ -119,7 +117,7 @@
 
 ;;
 ;; Whenever we connect to a moo, set up the appropriate hot objects.
-;;  
+;;
 (defun rmoo-objects-initialize ()
   (let* ((world rmoo-world-here)
 	 (objects (get world 'objects))
@@ -220,7 +218,7 @@
 
 ;;
 ;; A function for adding an object and some properties
-;; 
+;;
 (defun rmoo-objects-add (object-name plist)
     (let ((object (mo-intern object-name rmoo-world-here)))
       (setplist object plist)))
@@ -235,14 +233,14 @@
 		    (prin1-to-string (symbol-plist object))
 		    ")\n"))
   (insert-before-markers s)))
-    
+
 (defun rmoo-objects-write-objects-file (file)
   "Write the current set of cached objects to a rmoo-world-here's objects-file if it's defined. Otherwise prompt for a file name and write to it."
   (interactive (list (or (get rmoo-world-here 'objects-file)
 			 (read-file-name "Objects file: "))))
   (save-excursion
     (let ((objects (get rmoo-world-here 'objects))
-	  (buf (get-buffer-create 
+	  (buf (get-buffer-create
 		(generate-new-buffer-name (concat "* mo-save-"
 						  (symbol-name rmoo-world-here)
 						  "*"))))
@@ -252,7 +250,7 @@
       (mapatoms 'rmoo-objects-insert objects)
       (write-file file)
       (kill-buffer nil))))
-      
+
 ;;
 ;; Objects map
 ;;
@@ -281,7 +279,7 @@
 	    (aset objects i 0)))
       (setq i (- i 1)))
       (put world 'objects objects)))
-      
+
 (defun rmoo-objects-delete-object-here (object)
   (interactive (list (rmoo-objects-read-object-here)))
   (rmoo-objects-delete-object rmoo-world-here object))
@@ -289,7 +287,7 @@
 
 (defun rmoo-objects-read-object-here ()
   (setq rmoo-objects-current-moo rmoo-world-here)
-  (completing-read "Object: " 
+  (completing-read "Object: "
 		   'rmoo-objects-object-completion-function
 		   nil
 		   t
@@ -309,7 +307,7 @@
 	       nil
 	     (or (eq t comp) (mo-symname-to-objnum-here comp))))
 	  ((eq t flag)
-	   (setq comp (all-completions newstring 
+	   (setq comp (all-completions newstring
 				       (get world 'objects)
 				       predicate))
 	   (mapcar 'mo-symname-to-objnum-here comp))
@@ -317,12 +315,3 @@
 	   (if ((intern-soft newstring (get world 'objects)))
 	       t
 	     nil)))))
-
-;;
-;; $Log: rmoo-objects.el,v $
-;; Revision 1.2  1999/11/24 19:31:58  mattcamp
-;; Added missing "(require 'rmoo-mcp)" so that everything byte-compiles successfully.
-;;
-;; Revision 1.1  1999/03/02 00:18:22  mattcamp
-;; Initial revision
-;;

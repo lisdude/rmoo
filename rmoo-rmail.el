@@ -2,9 +2,7 @@
 ;;;; Majors modes for dealing with MOO Mail
 ;;;;
 ;;;; Original Author: Ron Tapia <tapia@nmia.com>
-;;;; $Author: mattcamp $
-;;;; $Date: 1999/03/02 00:19:55 $
-;;;; $Revision: 1.1 $
+;;;; Revised by: mattcamp
 
 ;;
 ;; This file gives MOO worlds a new property.
@@ -91,7 +89,7 @@ Commands:
   (interactive)
   (let ((message (rmoo-rmail-find-message)))
     (rmoo-send-here (concat rmoo-rmail-get-message-command
-			   " " 
+			   " "
 			   message
 			   " on "
 			   rmoo-recipient))))
@@ -125,7 +123,7 @@ Commands:
 		  'rmoo-rmail-display-lists
 		  "1.0"
           "1.0"
-          nil) 
+          nil)
 
 (rmoo-mcp-register "display-mail-summary"
 		  '(("list" . 'required))
@@ -213,7 +211,7 @@ Commands:
 	(put world 'goto-function 'switch-to-buffer-other-frame)
       (put world 'goto-function 'switch-to-buffer-other-window))
     (setq rmoo-rmail-window-list (cons (list rmoo-world-here
-					    (get-buffer-window 
+					    (get-buffer-window
 					     (current-buffer)))
 				      rmoo-rmail-window-list))))
 
@@ -226,7 +224,7 @@ Commands:
     (setq buffer-read-only t)
     (put rmoo-world-here 'goto-function 'rmoo-rmail-summary-goto-function)
     (put world 'goto-buffer (current-buffer))))
-    
+
 
 (defun rmoo-rmail-summary-goto-function (buf)
   (switch-to-buffer buf)
@@ -257,7 +255,7 @@ Commands:
     (if (looking-at rmoo-rmail-list-regexp)
 	(buffer-substring (match-beginning 1) (match-end 1))
       "me")))
-  
+
 (defun rmoo-rmail-find-message ()
   (save-excursion
     (beginning-of-line)
@@ -268,9 +266,3 @@ Commands:
 (defun rmoo-rmail-switch-to-lists-buffer ()
   (interactive)
   (switch-to-buffer (get rmoo-world-here 'rmoo-rmail-lists-buffer)))
-
-;;;;
-;;;; $Log: rmoo-rmail.el,v $
-;;;; Revision 1.1  1999/03/02 00:19:55  mattcamp
-;;;; Initial revision
-;;;;

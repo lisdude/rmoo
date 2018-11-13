@@ -1,9 +1,7 @@
 ;; rmoo-menus.el: Pull-down menus for RMOO
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcamp $
-;; $Date: 1999/03/02 00:16:00 $
-;; $Revision: 1.1 $
+;; Revised by: mattcamp
 
 (require 'rmoo)
 (require 'moocode-mode)
@@ -118,10 +116,4 @@
 ;;(defvar rmoo-commands-map '(keymap "MOO Commands"))
 ;;(define-key rmoo-interactive-mode-map [C-c-down-mouse-2] rmoo-commands-map)
 ;;(defvar common-commands (make-sparse-keymap "Common Commands"))
-;;(defvar 
-
-;;
-;; $Log: rmoo-menus.el,v $
-;; Revision 1.1  1999/03/02 00:16:00  mattcamp
-;; Initial revision
-;;
+;;(defvar

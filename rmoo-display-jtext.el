@@ -4,9 +4,7 @@
 ;; be output in lemoo form
 ;;
 ;; Original Author: Ron Tapia <tapia@nmia.com>
-;; $Author: mattcamp $
-;; $Date: 1999/03/02 00:04:08 $
-;; $Revision: 1.2 $
+;; Revised by: mattcamp
 ;;
 (require 'rmoo)
 
@@ -59,7 +57,7 @@ jtext-tagged text to the read function."
 			     jtext-header-6))
 
 (mapcar 'make-face jtext-header-faces)
-(mapcar (lambda (face) 
+(mapcar (lambda (face)
 	  (set-face-underline-p face t))
 	jtext-header-faces)
 
@@ -106,19 +104,19 @@ jtext-tagged text to the read function."
 (defvar jtext-link-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\^cm" 'jtext-indicated-link)))
-  
+
 
 
 (defun jtext-insert-link (address link-text)
   (let ((start (point)))
     (jtext-insert-hbox link-text)
     (let ((point (point)))
-      (add-text-properties start point 
+      (add-text-properties start point
 			   (list 'jtext-start start 'jtext-end point))
       (add-text-properties start point '(face bold-italic))
       (add-text-properties start point (list 'address address))
       (add-text-properties start point '(local-map jtext-link-map)))))
-      
+
 
 
 (defun jtext-indicated-link (event)
@@ -128,7 +126,7 @@ jtext-tagged text to the read function."
       (let* ((position (event-start event))
 	     (buffer (window-buffer (posn-window position)))
 	     (p (posn-point position))
-	     (jtext-address (get-text-property p 'address)) 
+	     (jtext-address (get-text-property p 'address))
 	     (text (and jtext-address
 			(save-excursion
 			  (set-buffer buffer)
@@ -165,7 +163,7 @@ jtext-tagged text to the read function."
 
 ;;
 ;; Stuff for interfacing with rmoo.el
-;;                           
+;;
 
 (defun rmoo-jtext-redirect-function (line)
   (cond ((eq (string-match "lemootag:" line) 0)
@@ -179,8 +177,3 @@ jtext-tagged text to the read function."
 
 (add-hook 'rmoo-handle-text-redirect-functions 'rmoo-jtext-redirect-function)
 (define-key rmoo-interactive-mode-map [mouse-1] 'jtext-select-link)
-
-;; $Log: rmoo-display-jtext.el,v $
-;; Revision 1.2  1999/03/02 00:04:08  mattcamp
-;; Added revision log.
-;;

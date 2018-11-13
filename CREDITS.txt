@@ -1,0 +1,356 @@
+This file is an aggregation of the original README as well as all non-git
+version control notes from the original authors.
+-------------------------------------------------------------------------
+                                   RMOO 1.1
+
+   Originally by [1]Ron Tapia <[2]tapia@nmia.com>
+   Maintained by [3]Matthew Campbell <[4]mattcampbell@pobox.com>
+
+Introduction
+
+   RMOO is a MOO client for Emacs. In addition to the basic features
+   present in any MOO client, RMOO includes more advanced features,
+   mainly the ability to edit MOO notes, mail, and code in separate Emacs
+   buffers and to easily send these buffers back to the MOO. RMOO also
+   includes support for the [5]Emacspeak audio desktop, so that people
+   who are blind and use Emacspeak can more easily use MOOs and other
+   similar servers.
+
+   You can always find the latest version of RMOO, along with pre-built
+   Red Hat packages, at the [6]RMOO home page.
+
+Release History
+
+   Version 1.1 (released October 18, 2000)
+          This is a maintenance release. In this release, I removed the
+          activity alert that Emacspeak users used to get while they were
+          typing in an RMOO buffer, because it caused problems with Emacs
+          20.5 and later. I also updated everything to reflect my new
+          email address and Web site address. Finally, I quit using Latte
+          and now write the HTML code myself.
+
+   Version 1.0 (released January 17, 2000)
+          This is a major release, and a lot has changed. I reworked the
+          installation procedure to make it more like the standard
+          procedure for Emacs packages and open-source software in
+          general. I also improved support for Emacspeak and fixed other
+          miscellaneous problems. In particular, I added special sounds
+          that RMOO uses when running in conjunction with Emacspeak. I
+          got them from a collection of [7]cow sounds that I found on the
+          Web. I hope they will make your MOOing experience more fun.
+
+   May 26, 1999
+          In local editing, I added two new commands: C-c C-c now uploads
+          the current buffer to the MOO and destroys the window, and C-c
+          C-] destroys the window without uploading the buffer.
+
+   May 23, 1999
+          There is a new variable, rmoo-send-always-goto-end, which, if
+          set to t, will make RMOO always go to the end of the buffer
+          after sending a line, no matter where in the buffer the user
+          was.
+
+   March 21, 1999
+          In this release, I have one specific goal: to make the RMOO
+          extension for Emacspeak consistently notify the user of
+          activity in a MOO buffer which is not his current buffer, and
+          to make it consistently read that activity to the user when he
+          switches to the MOO buffer. I believe I have achieved this
+          goal.
+
+   March 1, 1999
+
+          + Fixed a typo in the installation section of the README.
+          + Improved Emacspeak support with the help of [8]T. V. Raman.
+          + Fixed C-c C-q command to provide reasonable feedback after
+            disconnecting from the MOO.
+          + Added this "Release History" section to the README file.
+          + Converted this README file to [9]Latte, the Language for
+            Transforming Text. Latte's primary use now is to generate
+            HTML, and that is why I am using it. [10]Lynx is now used to
+            generate the plain-text version of this document. I am also
+            using [11]HTML Tidy to keep the generated markup clean.
+          + Put the files in this package under RCS control, with the
+            exception of the README and README.html files which are
+            generated from the Latte source.
+
+   February 20, 1999
+
+          + New unofficial maintainer.
+          + Added support for the Emacspeak audio desktop and fixed a bug
+            in the process.
+          + Moved default RMOO directory from ~/emacs/rmoo to ~/rmoo for
+            easier installation.
+          + Updated installation and W3 sections in the README.
+          + Added "Introduction" and "Getting Started" sections.
+          + Finally, this package is now in a tar.gz file instead of an
+            uncompressed tar file.
+
+   October 9, 1994
+          Original version by Ron Tapia.
+
+Requirements
+
+   To use RMOO, you should have [12]GNU Emacs version 20 or later. I have
+   not tested RMOO with XEmacs recently, though it may work. To take
+   advantage of some features of the MOO Client Protocol (MCP), you will
+   need [13]Emacs/W3 as well.
+
+Installation
+
+   To install RMOO from the source package, follow these steps:
+     * Unpack the rmoo-1.1.tar.gz file.
+     * Change to the new RMOO source directory (rmoo-1.1) and type the
+       following commands as any user:
+       ./configure
+       make
+     * Now, as root, type this while in the RMOO source directory: make
+       install
+     * Add the following line to your .emacs file or your
+       /usr/share/emacs/site-lisp/site-start.el file:
+       (require 'rmoo-autoload)
+
+   You can also get a Red Hat package that is ready to install and use
+   from the [14]RMOO home page.
+
+  Upgrading from pre-1.0 versions of RMOO
+
+   For users of RMOO versions before 1.0, you need to do a little
+   preparation before installing the new version. When you installed an
+   older version of RMOO, you had to add a block of code from a file
+   called fragment-of-.emacs to your .emacs file. You must now remove
+   this code, because it has moved into the main RMOO code. This block
+   started with the following:
+;;
+;; Change this if you want to keep the rmoo source somewhere else.
+;;
+
+   and ended with the following:
+(rmoo-load-libs)
+
+   Once you have removed this block, you can continue with the normal
+   RMOO installation procedure. At this point, you will not have the
+   shortcut key (C-c m) that you used to use to start RMOO. TO get this
+   back, refer to the Tips and Tricks section.
+
+Getting Started
+
+   Once you have installed RMOO using the instructions provided above,
+   you can connect to a MOO any time by pressing M-x rmoo. When you are
+   prompted for a MOO world, you can either enter one, optionally using
+   Emacs's completion facility to help you, or you can press Enter
+   without entering anything. If you do the latter, you will be prompted
+   for the site and port, in addition to login name and password.
+
+  World List Basics
+
+   To add a new MOO world, type M-x rmoo-worlds-add-new-moo, and follow
+   the prompts. Then save the world list by typing M-x rmoo-worlds-save.
+
+Local Editing
+
+   One of the great benefits of RMOO is the ability to edit MOO mail,
+   code, or other text in a standard Emacs buffer, with all of the
+   editing commands available. This is a great improvement over the
+   primitive line editor provided by most MOOs. To turn on local editing
+   on a standard LambdaCore-based MOO, type:
+
+   @edit-options +local
+
+   A new Emacs buffer will now be opened when you want to edit something
+   on the MOO. RMOO provides instructions for sending the text to the MOO
+   or closing the window without sending.
+
+Tips and Tricks
+
+   If you have trouble with RMOO leaving the point at the end of the line
+   you just sent, you may find it helpful to add the following to your
+   .emacs file:
+
+   (setq rmoo-send-always-goto-end t)
+
+   This will cause RMOO to always go to the end of the buffer after
+   sending a line. You can also configure RMOO so that it will not send
+   your input to the server unless you are on the last line of the
+   buffer. This is helpful for Emacspeak users who review the MOO buffer
+   with the cursor movement keys, and then start typing without going to
+   the end of the buffer. To turn on this feature, add this to your
+   .emacs file:
+
+   (setq rmoo-send-require-last-line t)
+
+   You may find it helpful to have a shortcut key that you can use to
+   start RMOO. To add this feature, add the following to your .emacs
+   file:
+
+   (global-set-key "\C-cm" 'rmoo)
+
+   You can now start RMOO with C-c m.
+
+   Enjoy,
+   Matt Campbell
+
+References
+
+   1. http://www.nmia.com/~tapia/
+   2. mailto:tapia@nmia.com
+   3. http://www.pobox.com/~mattcampbell/
+   4. mailto:mattcampbell@pobox.com
+   5. http://cs.cornell.edu/home/raman/emacspeak/
+   6. http://www.pobox.com/~mattcampbell/rmoo.html
+   7. http://www.geocities.com/Hollywood/Lot/4847/cow.html
+   8. http://cs.cornell.edu/home/raman/
+   9. http://www.latte.org/
+  10. http://lynx.browser.org/
+  11. http://www.w3.org/People/Raggett/tidy
+  12. http://www.gnu.org/software/emacs/
+  13. http://www.cs.indiana.edu/elisp/w3/docs.html
+  14. http://www.pobox.com/~mattcampbell/rmoo.html
+
+Original Version Control Notes:
+;;
+;; $Log: emacspeak-rmoo.el,v $
+;; Revision 1.10  2000/10/18 21:32:22  mattcampbell
+;; Updated my email address and changed the copyright notice.
+;;
+;; Revision 1.9  2000/10/16 22:14:41  mattcamp
+;; Removed the activity alert that happens when the user is typing; this caused problems for Emacs 20.5 and later.
+;;
+;; Revision 1.8  2000/01/15 20:36:05  mattcamp
+;; Added support for special MOO sounds, including a quick hack to notify the user via an auditory icon if new text arrives from the MOO while he's typing in that MOO buffer.
+;;
+;; Revision 1.7  1999/10/30 01:09:47  mattcamp
+;; Moved requires for emacspeak modules into a condition-case, as in w3-speak, so that this module will compile when emacspeak isn't loaded.
+;;
+;; Revision 1.6  1999/07/18 00:10:58  mattcamp
+;; Added an advice form for the rmoo function to provide an appropriate
+;; auditory icon and sync Emacspeak with the synthesizer.  Also removed
+;; the line to load the buff-menu library and replaced the many advice
+;; forms on buffer-related functions with a single advice form for
+;; emacspeak-speak-mode-line, to make sure that emacspeak-rmoo-catchup is
+;; called wherever it makes sense to call it.
+;;
+;; Revision 1.5  1999/03/21 14:33:05  mattcamp
+;; Replaced the algorithm for determining whether a user should be notified
+;; of activity in a MOO buffer with something that is more reliable and
+;; makes more sense.
+;;
+;; Revision 1.4  1999/03/20 19:43:32  mattcamp
+;; Took a little advice from the Emacspeak code (pun completely intended)
+;; and fixed the advice forms to act only when the functions are called
+;; interactively, then added advice for the functions that open buffers
+;; selected from the buffer menu.  Now the system should consistently
+;; read missed activity in a MOO buffer when the user switches to that
+;; buffer.
+;;
+;; Revision 1.3  1999/03/20 17:31:59  mattcamp
+;; Simplified the code that sets the emacspeak-rmoo-unheard-output-start
+;; and emacspeak-rmoo-unheard-output-end variables.
+;;
+;; Revision 1.2  1999/03/07 04:18:29  mattcamp
+;; Fixed bug in advice definitions that was causing some of
+;; emacspeak's advice forms to be overwritten.
+;;
+;; Revision 1.1  1999/03/01 23:01:02  mattcamp
+;; Initial revision
+;;
+;;; $Log: prefix.el,v $
+;;; Revision 1.1  1999/03/01 23:04:22  mattcamp
+;;; Initial revision
+;;;
+;; $Log: rmoo-display-jtext.el,v $
+;; Revision 1.2  1999/03/02 00:04:08  mattcamp
+;; Added revision log.
+;;
+;; $Log: rmoo-extras.el,v $
+;; Revision 1.1  1999/03/02 00:05:04  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-list.el,v $
+;; Revision 1.1  1999/03/02 00:06:49  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-local-edit.el,v $
+;; Revision 1.3  1999/11/24 19:21:46  mattcamp
+;; Now requires rmoo-mcp, so it will byte-compile successfully.
+;;
+;; Revision 1.2  1999/03/02 00:10:09  mattcamp
+;; Removed the word "stoopid" from the comment at the top.
+;;
+;; Revision 1.1  1999/03/02 00:09:29  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-mail.el,v $
+;; Revision 1.1  1999/03/02 00:12:11  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-mcp.el,v $
+;; Revision 1.3  1999/11/24 19:20:22  mattcamp
+;; Added "(provide 'rmoo-mcp)" so that other modules requiring MCP can require rmoo-mcp and byte-compile successfully (because one of my users insists on having all of RMOO compiled).
+;;
+;; Revision 1.2  1999/06/07 14:34:51  mattcamp
+;; Disabled automatic calling of rmoo-mcp-init-connection on connection; now it is only called if the server sends "#$#mcp version: 1.0".  This is to prevent error messages from servers that don't handle MCP/1.0 messages well.
+;;
+;; Revision 1.1  1999/03/02 00:14:38  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-menus.el,v $
+;; Revision 1.1  1999/03/02 00:16:00  mattcamp
+;; Initial revision
+;;
+;; $Log: rmoo-objects.el,v $
+;; Revision 1.2  1999/11/24 19:31:58  mattcamp
+;; Added missing "(require 'rmoo-mcp)" so that everything byte-compiles successfully.
+;;
+;; Revision 1.1  1999/03/02 00:18:22  mattcamp
+;; Initial revision
+;;
+;;;; $Log: rmoo-rmail.el,v $
+;;;; Revision 1.1  1999/03/02 00:19:55  mattcamp
+;;;; Initial revision
+;;;;
+;; $Log: rmoo.el,v $
+;; Revision 1.12  2000/10/18 21:33:39  mattcampbell
+;; Updated my email address.
+;;
+;; Revision 1.11  1999/11/24 19:32:36  mattcamp
+;; Moved declaration of rmoo-setup-done to avoid compiler warning.
+;;
+;; Revision 1.10  1999/08/17 12:31:16  mattcamp
+;; Fixed a typo in the handling of raw IP addresses (changed 'buff' to 'buf').
+;;
+;; Revision 1.9  1999/07/17 19:25:40  mattcamp
+;; Now all of the RMOO setup code runs when the rmoo function runs (if
+;; the newly added rmoo-setup-done variable is nil), and rmoo-x-libraries
+;; is now defined wiht a defvar rather than a setq function.
+;;
+;; Revision 1.8  1999/06/13 02:19:23  mattcamp
+;; Integrated RMOO setup (the loading of extra libraries and the worlds file), which was formerly placed in the user's .emacs file, into this file, so users don't have to add the large code block to their .emacs files anymore.
+;;
+;; Revision 1.7  1999/05/28 01:18:15  mattcamp
+;; Added new variable, rmoo-send-require-last-line, which when turned on causes rmoo-send to refuse to send anywhere else than the last line of the buffer.  Also modified rmoo-send to handle this.
+;;
+;; Revision 1.6  1999/05/27 00:37:35  mattcamp
+;; I also forgot to make the rmoo-destroy function interactive, so I fixed that.
+;;
+;; Revision 1.5  1999/05/27 00:18:22  mattcamp
+;; Added rmoo-destroy function for destroying a buffer and window without uploading.
+;;
+;; Revision 1.4  1999/05/27 00:13:22  mattcamp
+;; Forgot to make rmoo-upload-and-destroy interactive, so I fixed that.
+;;
+;; Revision 1.3  1999/05/26 23:38:08  mattcamp
+;; Added function rmoo-upload-and-destroy to upload a buffer, kill the buffer, and delete the window.
+;;
+;; Revision 1.2  1999/05/24 01:23:41  mattcamp
+;; Added rmoo-send-always-goto-end option to make RMOO always go to the end
+;; of a buffer after sending.
+;;
+;; Revision 1.1  1999/03/02 00:23:09  mattcamp
+;; Initial revision
+;;
+;; Pre-RCS modifications by Matthew Campbell <mattcampbell@pobox.com>:
+;; Fixed a bug in rmoo-handle-text that prevented rmoo-handle-text-hooks
+;; from being run correctly.  Also modified rmoo-quit to provide reasonable
+;; feedback after the user confirms his choice to disconnect.
+;;

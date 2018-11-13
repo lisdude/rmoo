@@ -1,222 +1,109 @@
-The most up-to-date documentation can be found in the [RMOO manual](MANUAL.md). Everything below comes from the original project and may or may not still apply.
+# RMOO 1.2
 
----
+The following documents how to get RMOO up and running for the complete beginner. If you're unfamiliar with Emacs, the conventions used may be a bit odd. Here's a quick rundown of how commands are presented:
 
-                                   RMOO 1.1
-                                       
-   Originally by [1]Ron Tapia <[2]tapia@nmia.com>
-   Maintained by [3]Matthew Campbell <[4]mattcampbell@pobox.com>
-   
-Introduction
+When prefixed with a C-, that means hold down CTRL and the letter following C-. e.g. `C-w` means hold down CTRL while pressing w.
+When prefixed with an M-, that means your meta key. Typically this is your Windows or Option key. e.g. `M-x` means to hold down meta while pressing x. (This will often be followed by a full string. M-x allows you to run commands by typing them in.)
 
-   RMOO is a MOO client for Emacs. In addition to the basic features
-   present in any MOO client, RMOO includes more advanced features,
-   mainly the ability to edit MOO notes, mail, and code in separate Emacs
-   buffers and to easily send these buffers back to the MOO. RMOO also
-   includes support for the [5]Emacspeak audio desktop, so that people
-   who are blind and use Emacspeak can more easily use MOOs and other
-   similar servers.
-   
-   You can always find the latest version of RMOO, along with pre-built
-   Red Hat packages, at the [6]RMOO home page.
-   
-Release History
+### Installation
+The simplest way to install, in my opinion:
+1. `git clone https://github.com/lisdude/rmoo.git ~/.emacs.d/rmoo`
+2. Add the following to your configuration file:
+```
+(add-to-list 'load-path "~/.emacs.d/rmoo")
+(require 'rmoo-autoload)
+(require 'moocode-mode)
+(global-set-key (kbd "C-c C-r") 'rmoo)
+(add-to-list 'auto-mode-alist '("\\.moo$" . moocode-mode)) 
+(add-hook 'rmoo-interactive-mode-hooks (lambda ()
+(linum-mode -1)                  ;; ... no line numbers
+(goto-address-mode t)))          ;; ... clickable links
+```
 
-   Version 1.1 (released October 18, 2000)
-          This is a maintenance release. In this release, I removed the
-          activity alert that Emacspeak users used to get while they were
-          typing in an RMOO buffer, because it caused problems with Emacs
-          20.5 and later. I also updated everything to reflect my new
-          email address and Web site address. Finally, I quit using Latte
-          and now write the HTML code myself.
-          
-   Version 1.0 (released January 17, 2000)
-          This is a major release, and a lot has changed. I reworked the
-          installation procedure to make it more like the standard
-          procedure for Emacs packages and open-source software in
-          general. I also improved support for Emacspeak and fixed other
-          miscellaneous problems. In particular, I added special sounds
-          that RMOO uses when running in conjunction with Emacspeak. I
-          got them from a collection of [7]cow sounds that I found on the
-          Web. I hope they will make your MOOing experience more fun.
-          
-   May 26, 1999
-          In local editing, I added two new commands: C-c C-c now uploads
-          the current buffer to the MOO and destroys the window, and C-c
-          C-] destroys the window without uploading the buffer.
-          
-   May 23, 1999
-          There is a new variable, rmoo-send-always-goto-end, which, if
-          set to t, will make RMOO always go to the end of the buffer
-          after sending a line, no matter where in the buffer the user
-          was.
-          
-   March 21, 1999
-          In this release, I have one specific goal: to make the RMOO
-          extension for Emacspeak consistently notify the user of
-          activity in a MOO buffer which is not his current buffer, and
-          to make it consistently read that activity to the user when he
-          switches to the MOO buffer. I believe I have achieved this
-          goal.
-          
-   March 1, 1999
-          
-          + Fixed a typo in the installation section of the README.
-          + Improved Emacspeak support with the help of [8]T. V. Raman.
-          + Fixed C-c C-q command to provide reasonable feedback after
-            disconnecting from the MOO.
-          + Added this "Release History" section to the README file.
-          + Converted this README file to [9]Latte, the Language for
-            Transforming Text. Latte's primary use now is to generate
-            HTML, and that is why I am using it. [10]Lynx is now used to
-            generate the plain-text version of this document. I am also
-            using [11]HTML Tidy to keep the generated markup clean.
-          + Put the files in this package under RCS control, with the
-            exception of the README and README.html files which are
-            generated from the Latte source.
-            
-   February 20, 1999
-          
-          + New unofficial maintainer.
-          + Added support for the Emacspeak audio desktop and fixed a bug
-            in the process.
-          + Moved default RMOO directory from ~/emacs/rmoo to ~/rmoo for
-            easier installation.
-          + Updated installation and W3 sections in the README.
-          + Added "Introduction" and "Getting Started" sections.
-          + Finally, this package is now in a tar.gz file instead of an
-            uncompressed tar file.
-            
-   October 9, 1994
-          Original version by Ron Tapia.
-          
-Requirements
+### World Management
+#### Adding World
+To add a world, type: `M-x rmoo-worlds-add-new-moo` (or press `C-c C-w C-a`)
 
-   To use RMOO, you should have [12]GNU Emacs version 20 or later. I have
-   not tested RMOO with XEmacs recently, though it may work. To take
-   advantage of some features of the MOO Client Protocol (MCP), you will
-   need [13]Emacs/W3 as well.
-   
-Installation
+You will then be prompted for the following:
+- __World Name__ - The name of the MOO you're connecting to. e.g. `Miriani`
+- __Site__ - The address of the MOO you're connecting to. e.g. `toastsoft.net`
+- __Port__ - The port of the MOO you're connecting to. e.g. `1443`
+- __TLS/SSL__ - If the MOO you're connecting to supports secure connections over TLS / SSL, say yes here.
+- __Log File Path__ - The path of the file where all of the MOO's output will be saved.
 
-   To install RMOO from the source package, follow these steps:
-     * Unpack the rmoo-1.1.tar.gz file.
-     * Change to the new RMOO source directory (rmoo-1.1) and type the
-       following commands as any user:
-       ./configure
-       make
-     * Now, as root, type this while in the RMOO source directory: make
-       install
-     * Add the following line to your .emacs file or your
-       /usr/share/emacs/site-lisp/site-start.el file:
-       (require 'rmoo-autoload)
+Once the world is added, you'll probably want to save it for future connections. To save your world file, type: `M-x rmoo-worlds-save-worlds-to-file` (or `C-c C-w C-s`)
 
-   To install from the git repository:
-     * Generate aclocal.m4 and Makefile.in files along with the configure
-       script:
-       $ aclocal
-       $ autoconf
-       $ automake
-     * Generate Makefile:
-       $ ./configure
-     * Build:
-       $ make
-     * Install (as root):
-       # make install
-       
-   You can also get a Red Hat package that is ready to install and use
-   from the [14]RMOO home page.
-   
-  Upgrading from pre-1.0 versions of RMOO
-  
-   For users of RMOO versions before 1.0, you need to do a little
-   preparation before installing the new version. When you installed an
-   older version of RMOO, you had to add a block of code from a file
-   called fragment-of-.emacs to your .emacs file. You must now remove
-   this code, because it has moved into the main RMOO code. This block
-   started with the following:
-;;
-;; Change this if you want to keep the rmoo source somewhere else.
-;;
+#### Connecting and Disconnecting
+To connect to a world, type `M-x rmoo` (or `C-c C-r`)
 
-   and ended with the following:
-(rmoo-load-libs)
+To disconnect from a world, type `M-x rmoo-quit` (or `C-c C-q`)
 
-   Once you have removed this block, you can continue with the normal
-   RMOO installation procedure. At this point, you will not have the
-   shortcut key (C-c m) that you used to use to start RMOO. TO get this
-   back, refer to the Tips and Tricks section.
-   
-Getting Started
+### Editing Code
+First, enable local editing inside your MOO: `@edito-o +local`
 
-   Once you have installed RMOO using the instructions provided above,
-   you can connect to a MOO any time by pressing M-x rmoo. When you are
-   prompted for a MOO world, you can either enter one, optionally using
-   Emacs's completion facility to help you, or you can press Enter
-   without entering anything. If you do the latter, you will be prompted
-   for the site and port, in addition to login name and password.
-   
-  World List Basics
-  
-   To add a new MOO world, type M-x rmoo-worlds-add-new-moo, and follow
-   the prompts. Then save the world list by typing M-x rmoo-worlds-save.
-   
-Local Editing
+Once you @edit a verb, the screen will split in half with your verb code on one side and the MOO output on the other. For basic commands to use to manipulate windows, see the [Window Management](#Window-Management) section below. Here are some commands that will come in handy in the editor:
 
-   One of the great benefits of RMOO is the ability to edit MOO mail,
-   code, or other text in a standard Emacs buffer, with all of the
-   editing commands available. This is a great improvement over the
-   primitive line editor provided by most MOOs. To turn on local editing
-   on a standard LambdaCore-based MOO, type:
-   
-   @edit-options +local
-   
-   A new Emacs buffer will now be opened when you want to edit something
-   on the MOO. RMOO provides instructions for sending the text to the MOO
-   or closing the window without sending.
-   
-Tips and Tricks
+| Command   | Effect                                               |
+| --------- | ---------------------------------------------------- |
+| `C-c s`   | Send your code to the MOO.                           |
+| `C-c c`   | Send your code to the MOO and close the editor pane. |
+| `C-j`     | Add a newline and indent.                            |
+| `C-c C-c` | Comment out the selection.                           |
+| `C-c C-u` | Uncomment the selection.                             |
+|           |                                                      |
 
-   If you have trouble with RMOO leaving the point at the end of the line
-   you just sent, you may find it helpful to add the following to your
-   .emacs file:
-   
-   (setq rmoo-send-always-goto-end t)
-   
-   This will cause RMOO to always go to the end of the buffer after
-   sending a line. You can also configure RMOO so that it will not send
-   your input to the server unless you are on the last line of the
-   buffer. This is helpful for Emacspeak users who review the MOO buffer
-   with the cursor movement keys, and then start typing without going to
-   the end of the buffer. To turn on this feature, add this to your
-   .emacs file:
-   
-   (setq rmoo-send-require-last-line t)
-   
-   You may find it helpful to have a shortcut key that you can use to
-   start RMOO. To add this feature, add the following to your .emacs
-   file:
-   
-   (global-set-key "\C-cm" 'rmoo)
-   
-   You can now start RMOO with C-c m.
-   
-   Enjoy,
-   Matt Campbell
+### Commands and Keybindings
+| Command                | Keybinding    | Effect                                                                                                                                                                                                              |
+| ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rmoo`                 | `C-c C-r`     | Open the world list to select a world to connect to.                                                                                                                                                                |
+| `rmoo-quit`            | `C-c C-q`     | Disconnect from the current world.                                                                                                                                                                                  |
+| `rmoo-scratch`         | `C-c C-s`     | Open a scratch buffer. Anything you enter in this buffer will get sent directly to the MOO. This is useful for pasting in long scripts or using the @paste command. Like the code editor, you can send with `C-c s` |
+| `rmoo-@paste-kill`     | `C-c C-p`     | @paste whatever is in the 'kill ring'.                                                                                                                                                                              |
+| `rmoo-set-linelength`  | `C-c C-l`     | Automatically set @linelength based on the size of your Emacs window.                                                                                                                                               |
+| `rmoo-clear-input`     | `M-backspace` | Delete the contents of the command line and, if scrolled up, jump back to the command line.                                                                                                                         |
+| `rmoo-up-command`      | `Up Arrow`    | Recall command history. Can also be summoned with `Esc-p`                                                                                                                                                           |
+| `rmoo-down-command`    | `Down Arrow`  | Same as up arrow, only opposite direction. Can also be summoned with `Esc-n`                                                                                                                                        |
+| `rmoo-extras-get-verb` | `C-c C-v`     | Prompts for a verb name to edit in the local editor.                                                                                                                                                                |
+| `rmoo-extras-get-prop` | `C-c C-p`     | Prompts for a property name to edit in the local editor.                                                                                                                                                            |
+|                        |               |                                                                                                                                                                                                                     |
 
-References
+### Miscellaneous Settings
+These are some settings you can put in your general Emacs settings to enhance your rmoo experience.
 
-   1. http://www.nmia.com/~tapia/
-   2. mailto:tapia@nmia.com
-   3. http://www.pobox.com/~mattcampbell/
-   4. mailto:mattcampbell@pobox.com
-   5. http://cs.cornell.edu/home/raman/emacspeak/
-   6. http://www.pobox.com/~mattcampbell/rmoo.html
-   7. http://www.geocities.com/Hollywood/Lot/4847/cow.html
-   8. http://cs.cornell.edu/home/raman/
-   9. http://www.latte.org/
-  10. http://lynx.browser.org/
-  11. http://www.w3.org/People/Raggett/tidy
-  12. http://www.gnu.org/software/emacs/
-  13. http://www.cs.indiana.edu/elisp/w3/docs.html
-  14. http://www.pobox.com/~mattcampbell/rmoo.html
+| Setting                                                   | Effect                                                                                                       |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `(setq write-region-inhibit-fsync t)`                     | Disable fsync, which vastly speeds up writing to log files at the expense of safety in the event of a crash. |
+| `(evil-set-initial-state 'rmoo-interactive-mode 'insert)` | Start MOOcode mode in insert mode when using evil.                                                           |
+| `(evil-set-initial-state 'rmoo-scratch-mode 'insert)`     | Start MOO scratch buffers in insert mode.                                                                    |
+| `(setq rmoo-connect-function 'socks-open-network-stream)` | Use a SOCKS proxy for connecting to MOOs. See the 'Proxy' section.                                           |
+
+### Window Management
+| Command | Effect                                                                                         |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| `C-x o` | Switches between open panes.                                                                   |
+| `C-x 0` | Close the current pane.                                                                        |
+| `C-x b` | Display a list of buffers to open in current pane. This is useful when editing multiple verbs. |
+| `C-x 3` | Split the screen vertically. Typically followed by `C-x b` to open a buffer.                   |
+| `C-x 2` | Split the screen horizontally.                                                                 |
+| `C-x k` | Select a buffer to close entirely.                                                                                               |
+
+### Changelog
+__Version 1.2 (November 13, 2018)__
+- Add 256-color ANSI support.
+- Add support for SSL/TLS connections.
+- Prevent backspace from deleting the prompt.
+- Add logging capabilities.
+- Add a scratch buffer, allowing you to execute arbitrary commands from a separate buffer. Useful for pasting @dump output, @paste, etc.
+- Add a new keybinding to automatically set @linelength based on window size with `C-c C-l`
+- Added more documentation.
+- Replaced MCP 1.0 support with MCP 2.1 support. Implemented packages include:
+    - mcp-negotiate
+    - dns-org-mud-moo-simpleedit
+    - dns-com-awns-status
+    - dns-com-vmoo-client
+
+__Earlier Versions__
+- See [CREDITS.txt](CREDITS.txt) for original changelogs and version control notes.
+
+### Authors
+[Ron Tapia](http://www.nmia.com/~tapia/) <[tapia@nmia.com](mailto:tapia@nmia.com)>, [Matthew Campbell](http://www.pobox.com/~mattcampbell/) <[mattcampbell@pobox.com](mailto:mattcampbell@pobox.com)>, [lisdude](https://www.lisdude.com) <[lisdude@lisdude.com](mailto:lisdude@lisdude.com)>

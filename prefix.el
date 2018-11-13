@@ -1,9 +1,7 @@
 ;;; Prefix/suffix regions with strings
 ;;;
 ;;; Original Author: Ron Tapia <tapia@nmia.com>
-;;; $Author: mattcamp $
-;;; $Date: 1999/03/01 23:04:22 $
-;;; RRevision$
+;;; Revised by: mattcamp
 
 (defun surround-region (before prefix suffix after &optional start end)
   "Place specified strings before, PREFIXing each line, SUFFIXing
@@ -44,8 +42,3 @@ If current-prefix-arg (\\[universal-argument]), prompt for string to suffix to r
   "Prefix current region with the > character."
   (interactive)
   (prefix-region-with-string ">"))
-
-;;; $Log: prefix.el,v $
-;;; Revision 1.1  1999/03/01 23:04:22  mattcamp
-;;; Initial revision
-;;;
