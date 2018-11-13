@@ -188,14 +188,14 @@
           (cond
             ((equal type "moo-code")
              'rmoo-mcp-cleanup-edit-program)
-            ((equal type "list")
+            ((equal type "string-list")
              'rmoo-mcp-cleanup-edit-list)
             ((equal type "mail")
              'rmoo-mcp-cleanup-edit-mail)
             ((equal type "jtext")
              'rmoo-mcp-cleanup-edit-jtext)
             (t
-              'rmoo-mcp-cleanup-edit-text)))
+              'rmoo-mcp-cleanup-edit-list)))
     (set-buffer buf)))
 
 ;;
@@ -203,9 +203,7 @@
 ;; the responsibility of displaying the buffer. It might be better
 ;; to have this responsibility lie elsewhere.
 ;;
-(defun rmoo-mcp-cleanup-edit-program ()
-  (let ((world rmoo-world-here))
-    (moocode-mode)
+(defun rmoo-mcp-common-editor-functions ()
     (goto-char (point-max))
     (goto-char (point-min))
     (setq rmoo-select-buffer (current-buffer))
@@ -213,23 +211,22 @@
     (setq rmoo-world-here world)
     (put rmoo-world-here 'goto-function 'switch-to-buffer-other-window)
     (put rmoo-world-here 'goto-buffer (current-buffer))
-    ;; Mode changes clear local variables and setting local variables inside a let is a no-go, soooo...
     (setq-local rmoo-mcp-tag rmoo-mcp-current-tag)
     (setq-local rmoo-mcp-reference rmoo-mcp-current-reference)
     (setq-local rmoo-mcp-key rmoo-mcp-current-key)
     (setq rmoo-mcp-current-key nil)
     (setq rmoo-mcp-current-tag nil)
-    (setq rmoo-mcp-current-reference nil)))
+    (setq rmoo-mcp-current-reference nil))
 
-(defun rmoo-mcp-cleanup-edit-text ()
+(defun rmoo-mcp-cleanup-edit-program ()
   (let ((world rmoo-world-here))
-    (rmoo-text-mode)
-    (goto-char (point-max))
-    (insert ".\n")
-    (goto-char (point-min))
-    (setq rmoo-select-buffer (current-buffer))
-    (display-buffer (current-buffer) t)
-    (setq rmoo-world-here world)))
+    (moocode-mode)
+    (rmoo-mcp-common-editor-functions)))
+
+(defun rmoo-mcp-cleanup-edit-list ()
+  (let ((world rmoo-world-here))
+    (rmoo-list-mode)
+    (rmoo-mcp-common-editor-functions)))
 
 (defun rmoo-mcp-cleanup-edit-mail ()
   (let ((world rmoo-world-here))
@@ -237,16 +234,6 @@
     (goto-char (point-max))
     (insert "\n.\n")
     (backward-char 3)
-    (setq rmoo-select-buffer (current-buffer))
-    (display-buffer (current-buffer) t)
-    (setq rmoo-world-here world)))
-
-(defun rmoo-mcp-cleanup-edit-list ()
-  (let ((world rmoo-world-here))
-    (rmoo-list-mode)
-    (goto-char (point-max))
-    (insert ".\n")
-    (goto-char (point-min))
     (setq rmoo-select-buffer (current-buffer))
     (display-buffer (current-buffer) t)
     (setq rmoo-world-here world)))
@@ -335,7 +322,7 @@
                (rmoo-output-function-return-control-to-last)
                (rmoo-set-output-buffer-to-last)
                'rmoo-mcp-nil-function))
-            ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content:") line) 0)
+            ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content: ") line) 0)
              (setq line (substring line (match-end 0)))
              (set-buffer (get rmoo-world-here 'output-buffer))
              (let ((start (point))

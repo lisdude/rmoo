@@ -526,7 +526,7 @@ Keymap:
 	"rmoo-mcp"
 	"prefix"
 	"moocode-mode"
-	"rmoo-text"
+	"rmoo-list"
 	"rmoo-mail"
 	"rmoo-objects"
 	"rmoo-local-edit"
