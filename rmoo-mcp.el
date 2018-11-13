@@ -125,24 +125,24 @@
 
 (defun rmoo-mcp-register (package-name keys setup-function min-version max-version init-function)
   "Register a new mcp request type.
-PACKAGE-NAME is the full, official name of the MCP package.
-KEYS is an alist of pairs (key . default-value).
-The key must be a string.
-The default-value must be a string, or the symbol 'required, which means
-that the request must supply a value.
-SETUP-FUNCTION is a symbol for the function that gets called to set up
-request-specific details.
-MIN-VERSION is the minimum version of the MCP package supported.
-MAX-VERSION is the maximum version of the MCP package supported.
-INIT-FUNCTION is a symbol for the function that gets called immediately after negotiation is complete."
-(let* ((key package-name)
-       (value (list keys setup-function min-version max-version init-function))
-       (entry (assoc key rmoo-mcp-request-table)))
-  (if entry
-    (setcdr entry value)
-    (progn
-      (setq rmoo-mcp-request-table (cons (cons key value)
-                                         rmoo-mcp-request-table))))))
+  PACKAGE-NAME is the full, official name of the MCP package.
+  KEYS is an alist of pairs (key . default-value).
+  The key must be a string.
+  The default-value must be a string, or the symbol 'required, which means
+  that the request must supply a value.
+  SETUP-FUNCTION is a symbol for the function that gets called to set up
+  request-specific details.
+  MIN-VERSION is the minimum version of the MCP package supported.
+  MAX-VERSION is the maximum version of the MCP package supported.
+  INIT-FUNCTION is a symbol for the function that gets called immediately after negotiation is complete."
+  (let* ((key package-name)
+         (value (list keys setup-function min-version max-version init-function))
+         (entry (assoc key rmoo-mcp-request-table)))
+    (if entry
+      (setcdr entry value)
+      (progn
+        (setq rmoo-mcp-request-table (cons (cons key value)
+                                           rmoo-mcp-request-table))))))
 
 (defun rmoo-mcp-remove-line ()
   (let ((start (progn (rmoo-beginning-of-line) (point))))
@@ -170,9 +170,8 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
                    "1.0"
                    nil)
 
-
 (defun rmoo-mcp-start-edit (reference name type content _data-tag)
-    (setq rmoo-mcp-current-key rmoo-mcp-auth-key)
+  (setq rmoo-mcp-current-key rmoo-mcp-auth-key)
   (let ((buf (current-buffer))
         (world rmoo-world-here))
     (set-buffer (rmoo-mcp-setup-data (get-buffer-create name)))
@@ -197,7 +196,6 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
              'rmoo-mcp-cleanup-edit-jtext)
             (t
               'rmoo-mcp-cleanup-edit-text)))
-;;    (insert  upload "\n")
     (set-buffer buf)))
 
 ;;
@@ -209,7 +207,6 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   (let ((world rmoo-world-here))
     (moocode-mode)
     (goto-char (point-max))
-;;    (insert ".\n")
     (goto-char (point-min))
     (setq rmoo-select-buffer (current-buffer))
     (display-buffer (current-buffer) t)
@@ -314,14 +311,14 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
 (defun rmoo-mcp-redirect-function (line)
   (if (string-match "^#$#mcp version: [0-9]\.[0-9] to: [0-9]\.[0-9]$" line)
     (rmoo-mcp-init-connection)
-  (cond ((eq (string-match rmoo-mcp-regexp line) 0)
-         (rmoo-mcp-dispatch (rmoo-match-string 1 line)
-                            (if (match-beginning 3)
-                              (rmoo-match-string 3 line)
-                              nil)
-                            (rmoo-match-string 6 line))
-         'rmoo-mcp-nil-function)
-        (t nil))))
+    (cond ((eq (string-match rmoo-mcp-regexp line) 0)
+           (rmoo-mcp-dispatch (rmoo-match-string 1 line)
+                              (if (match-beginning 3)
+                                (rmoo-match-string 3 line)
+                                nil)
+                              (rmoo-match-string 6 line))
+           'rmoo-mcp-nil-function)
+          (t nil))))
 
 (defun rmoo-mcp-nil-function (line) "Okay, this is a kludge")
 
@@ -331,29 +328,29 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   ;; Ignore MCP_snoop
   (if (not (string-match "^S->C.*" line))
     (progn
-  (cond ((string= (concat "#$#: " rmoo-mcp-current-tag) line)
-         (progn
-           (set-buffer (get rmoo-world-here 'output-buffer))
-           (funcall rmoo-mcp-cleanup-function)
-           (rmoo-output-function-return-control-to-last)
-           (rmoo-set-output-buffer-to-last)
-           'rmoo-mcp-nil-function))
-        ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content:") line) 0)
-         (setq line (substring line (match-end 0)))
-         (set-buffer (get rmoo-world-here 'output-buffer))
-         (let ((start (point))
-               end)
-           (goto-char (point-max))
-           (insert-before-markers (concat line "\n"))
-           (save-restriction
-             (narrow-to-region start (point))
-             (goto-char start)
-             (run-hooks (rmoo-mcp-output-function-hooks)))))
-        (t
-          ;;Aieee! Run away
-          (rmoo-output-function-return-control-to-last)
-          (rmoo-set-output-buffer-to-last)
-          (message (concat "Garbled MCP Data: " line)))))))
+      (cond ((string= (concat "#$#: " rmoo-mcp-current-tag) line)
+             (progn
+               (set-buffer (get rmoo-world-here 'output-buffer))
+               (funcall rmoo-mcp-cleanup-function)
+               (rmoo-output-function-return-control-to-last)
+               (rmoo-set-output-buffer-to-last)
+               'rmoo-mcp-nil-function))
+            ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content:") line) 0)
+             (setq line (substring line (match-end 0)))
+             (set-buffer (get rmoo-world-here 'output-buffer))
+             (let ((start (point))
+                   end)
+               (goto-char (point-max))
+               (insert-before-markers (concat line "\n"))
+               (save-restriction
+                 (narrow-to-region start (point))
+                 (goto-char start)
+                 (run-hooks (rmoo-mcp-output-function-hooks)))))
+            (t
+              ;;Aieee! Run away
+              (rmoo-output-function-return-control-to-last)
+              (rmoo-set-output-buffer-to-last)
+              (message (concat "Garbled MCP Data: " line)))))))
 
 ;;
 ;; Interface to moo.el
