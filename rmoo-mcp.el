@@ -281,7 +281,8 @@
 (rmoo-mcp-register "dns-com-vmoo-client" '() 'rmoo-mcp-do-client "1.0" "1.0" 'rmoo-mcp-initialize-client)
 
 (defun rmoo-mcp-initialize-client (proc)
-  (rmoo-send-string (concat "#$#dns-com-vmoo-client-info " rmoo-mcp-auth-key " name: \"RMOO (Emacs)\" text-version: \"1.2\" internal-version: \"1.2\"") proc))
+  (rmoo-send-string (concat "#$#dns-com-vmoo-client-info " rmoo-mcp-auth-key " name: \"RMOO (Emacs)\" text-version: \"" rmoo-version "\" internal-version: \"0\"") proc)
+  (rmoo-send-string (concat "#$#dns-com-vmoo-client-screensize " rmoo-mcp-auth-key " Cols: " (number-to-string (- (window-total-width) 5)) " Rows: " (number-to-string (window-total-height))) proc))
 
 (defun rmoo-mcp-redirect-function (line)
   (if (string-match "^#$#mcp version: [0-9]\.[0-9] to: [0-9]\.[0-9]$" line)
