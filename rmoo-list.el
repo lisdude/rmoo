@@ -15,11 +15,14 @@
 
 (defvar rmoo-list-mode-map 
   (let ((map (make-sparse-keymap)))
-    (define-key map "\^c\^s" 'rmoo-upload-buffer-directly)
+    (define-key map (kbd "C-c c") 'rmoo-upload-and-destroy)
+    (define-key map (kbd "C-c s") 'rmoo-upload-buffer-directly)
+    (define-key map (kbd "<f7>") 'rmoo-upload-buffer-directly)
+    (define-key map (kbd "C-c ]") 'rmoo-destroy)
   map))
 
 (defun rmoo-list-mode ()
-  "A major mode for editing MOO lists.
+  "A major mode for editing MOO lists and arbitrary text.
 
 Commands:
 \\{rmoo-list-mode-map}"
