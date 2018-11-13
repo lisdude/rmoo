@@ -709,7 +709,15 @@ on the last line of the buffer.")
 
 (defun rmoo-upload-buffer-directly ()
   (interactive)
-  (rmoo-send-here (buffer-string)))
+  (if (boundp 'rmoo-mcp-reference)
+    (progn 
+    (rmoo-send-here (concat "#$#dns-org-mud-moo-simpleedit-set " rmoo-mcp-key " " rmoo-mcp-reference))
+    (goto-char (point-min))
+    (while (not (eobp))
+           (rmoo-send-here (concat "#$#* " rmoo-mcp-tag " content: " (buffer-substring-no-properties (point) (line-end-position))))
+           (forward-line 1))
+    (rmoo-send-here (concat "#$#: " rmoo-mcp-tag)))
+  (rmoo-send-here (buffer-string))))
 
 (defun rmoo-append-to-logfile (log-text)
   "Appends text to the log file.\nIf no log file is specifed (nil), nothing happens. That's about the extend of the safety checks, so hopefully the path is valid!"

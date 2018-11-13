@@ -15,17 +15,25 @@
                                 "\\( +\\([^ :\\\"]+\\)\\( \\|$\\)\\)?"       ; authentication-key
                                 "\\( *\\(.*\\)\\)$"))                        ; key-value pairs
 
-(defvar rmoo-mcp-quoting-prefix "@@@"
-  "Prepended to all data sent after an mcp command.
-  Must not contain any special regexp characters.")
-
-(defvar rmoo-mcp-incomplete nil)
+(defvar rmoo-mcp-keyval-regexp (concat "\\([^ \\\":]+\\): +"
+                                       "\\([^ \\\"]+\\|"
+                                       "\"\\([^\\\"]\\|\\\\.\\)*\"\\)"
+                                       "\\( +\\|$\\)")
+  "Recognize one keyword: value pair.")
 
 (defvar rmoo-status-text "Status"
   "The text currently appended to the status line.")
 
-(defvar rmoo-mcp-quoting-end "#$#END"
-  "Signals end of mcp data.")
+;; TODO: Combine these intermediary variables into a list
+(defvar rmoo-mcp-current-tag nil
+  "The _data_tag that we're currently looking for.")
+
+(defvar rmoo-mcp-current-tag nil
+  "The reference of the multi-line data we're currently working with.
+  This will get set local to the editor buffer.")
+
+(defvar rmoo-mcp-current-key nil
+  "A copy of the MCP auth key that we're currently working with.")
 
 (defvar rmoo-mcp-cleanup-function nil)
 
@@ -90,11 +98,6 @@
                              (throw 'rmoo-mcp-missing-arg 'rmoo-mcp-missing-arg))))))
                (nth 0 (cdr (setq barr entry))))))))
 
-(defvar rmoo-mcp-keyval-regexp (concat "\\([^ \\\":]+\\): +"
-                                       "\\([^ \\\"]+\\|"
-                                       "\"\\([^\\\"]\\|\\\\.\\)*\"\\)"
-                                       "\\( +\\|$\\)")
-  "Recognize one keyword: value pair.")
 
 (defun rmoo-mcp-parse-keyvals (keyval-string)
   (catch 'rmoo-mcp-failed-parse
@@ -151,20 +154,24 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
         rmoo-current-process (get-buffer-process (current-buffer))
         rmoo-buffer buffer))
 
-(rmoo-mcp-register "dns-org-mud-moo-simpleedit"
-                   '(("type" . "text")
+;; Simply register the package to begin with.
+(rmoo-mcp-register "dns-org-mud-moo-simpleedit" '() nil "1.0" "1.0" nil)
+
+;; Now go for the trigger
+(rmoo-mcp-register "dns-org-mud-moo-simpleedit-content"
+                   '(("reference" . 'required)
                      ("name" . 'required)
-                     ("upload" . 'required))
+                     ("type" . 'required)
+                     ("content*" . 'required)
+                     ("_data-tag" . 'required))
                    'rmoo-mcp-start-edit
                    "1.0"
                    "1.0"
                    nil)
 
-;;
-;; What have I done here? Basically, I've told rmoo-mcp-start-edit
-;; about rmoo-worlds.
-;;
-(defun rmoo-mcp-start-edit (type name upload)
+
+(defun rmoo-mcp-start-edit (reference name type content _data-tag)
+    (setq rmoo-mcp-current-key rmoo-mcp-auth-key)
   (let ((buf (current-buffer))
         (world rmoo-world-here))
     (set-buffer (rmoo-mcp-setup-data (get-buffer-create name)))
@@ -174,10 +181,12 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
     (put world 'last_output_buffer buf)
     (put world 'last-output-function (get world 'output-function))
     (put world 'output-function 'rmoo-mcp-output-function)
+    (setq rmoo-mcp-current-tag _data-tag)
+    (setq rmoo-mcp-current-reference (concat "reference: \"" reference "\" type: \"" type "\" content*: \"\" _data-tag: " _data-tag))
     (erase-buffer)
     (setq rmoo-mcp-cleanup-function
           (cond
-            ((equal type "program")
+            ((equal type "moo-code")
              'rmoo-mcp-cleanup-edit-program)
             ((equal type "list")
              'rmoo-mcp-cleanup-edit-list)
@@ -187,7 +196,7 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
              'rmoo-mcp-cleanup-edit-jtext)
             (t
               'rmoo-mcp-cleanup-edit-text)))
-    (insert  upload "\n")
+;;    (insert  upload "\n")
     (set-buffer buf)))
 
 ;;
@@ -199,11 +208,20 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
   (let ((world rmoo-world-here))
     (moocode-mode)
     (goto-char (point-max))
-    (insert ".\n")
+;;    (insert ".\n")
     (goto-char (point-min))
     (setq rmoo-select-buffer (current-buffer))
     (display-buffer (current-buffer) t)
-    (setq rmoo-world-here world)))
+    (setq rmoo-world-here world)
+    (put rmoo-world-here 'goto-function 'switch-to-buffer-other-window)
+    (put rmoo-world-here 'goto-buffer (current-buffer))
+    ;; Mode changes clear local variables and setting local variables inside a let is a no-go, soooo...
+    (setq-local rmoo-mcp-tag rmoo-mcp-current-tag)
+    (setq-local rmoo-mcp-reference rmoo-mcp-current-reference)
+    (setq-local rmoo-mcp-key rmoo-mcp-current-key)
+    (setq rmoo-mcp-current-key nil)
+    (setq rmoo-mcp-current-tag nil)
+    (setq rmoo-mcp-current-reference nil)))
 
 (defun rmoo-mcp-cleanup-edit-text ()
   (let ((world rmoo-world-here))
@@ -245,10 +263,6 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
     (switch-to-buffer-other-window (current-buffer))
     (setq rmoo-world-here world)))
 
-;;
-;; The functions that don't have data following are easily handled, they
-;; didn't require any modification. But see the mods to the general
-;; mcp stuff...
 ;;
 ;; Kind of cheat a little with negotiation and register each message as an individual package.
 ;; That way they get appropriately detected and handled without a separate regex or effort.
@@ -313,14 +327,17 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
 (defun rmoo-mcp-output-function-hooks ())
 
 (defun rmoo-mcp-output-function (line)
-  (cond ((string= rmoo-mcp-quoting-end line)
+  ;; Ignore MCP_snoop
+  (if (not (string-match "^S->C.*" line))
+    (progn
+  (cond ((string= (concat "#$#: " rmoo-mcp-current-tag) line)
          (progn
            (set-buffer (get rmoo-world-here 'output-buffer))
            (funcall rmoo-mcp-cleanup-function)
            (rmoo-output-function-return-control-to-last)
            (rmoo-set-output-buffer-to-last)
            'rmoo-mcp-nil-function))
-        ((eq (string-match (concat "^" rmoo-mcp-quoting-prefix) line) 0)
+        ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content:") line) 0)
          (setq line (substring line (match-end 0)))
          (set-buffer (get rmoo-world-here 'output-buffer))
          (let ((start (point))
@@ -335,25 +352,10 @@ INIT-FUNCTION is a symbol for the function that gets called immediately after ne
           ;;Aieee! Run away
           (rmoo-output-function-return-control-to-last)
           (rmoo-set-output-buffer-to-last)
-          (message (concat "Garbled MCP Data: " line)))))
-
-(defun rmoo-mcp-output-function-discard (line)
-  (message "Discarding line: %s" line))
+          (message (concat "Garbled MCP Data: " line)))))))
 
 ;;
 ;; Interface to moo.el
 ;;
 ;; (add-hook 'rmoo-interactive-mode-hooks 'rmoo-mcp-init-connection)
 (add-hook 'rmoo-handle-text-redirect-functions 'rmoo-mcp-redirect-function)
-
-;;
-;; $Log: rmoo-mcp.el,v $
-;; Revision 1.3  1999/11/24 19:20:22  mattcamp
-;; Added "(provide 'rmoo-mcp)" so that other modules requiring MCP can require rmoo-mcp and byte-compile successfully (because one of my users insists on having all of RMOO compiled).
-;;
-;; Revision 1.2  1999/06/07 14:34:51  mattcamp
-;; Disabled automatic calling of rmoo-mcp-init-connection on connection; now it is only called if the server sends "#$#mcp version: 1.0".  This is to prevent error messages from servers that don't handle MCP/1.0 messages well.
-;;
-;; Revision 1.1  1999/03/02 00:14:38  mattcamp
-;; Initial revision
-;;
