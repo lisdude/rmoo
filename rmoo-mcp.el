@@ -25,15 +25,8 @@
   "The text currently appended to the status line.")
 
 ;; TODO: Combine these intermediary variables into a list
-(defvar rmoo-mcp-current-tag nil
-  "The _data_tag that we're currently looking for.")
-
-(defvar rmoo-mcp-current-tag nil
-  "The reference of the multi-line data we're currently working with.
-  This will get set local to the editor buffer.")
-
-(defvar rmoo-mcp-current-key nil
-  "A copy of the MCP auth key that we're currently working with.")
+(defvar rmoo-mcp-intermediaries nil
+  "An intermediary associated list used to temporarily store information needed in editor buffers.")
 
 (defvar rmoo-mcp-cleanup-function nil)
 
@@ -171,7 +164,7 @@
                    nil)
 
 (defun rmoo-mcp-start-edit (reference name type content _data-tag)
-  (setq rmoo-mcp-current-key rmoo-mcp-auth-key)
+  (setq rmoo-mcp-intermediaries (cons (cons "auth-key" rmoo-mcp-auth-key) rmoo-mcp-intermediaries))
   (let ((buf (current-buffer))
         (world rmoo-world-here))
     (set-buffer (rmoo-mcp-setup-data (get-buffer-create name)))
@@ -181,8 +174,8 @@
     (put world 'last_output_buffer buf)
     (put world 'last-output-function (get world 'output-function))
     (put world 'output-function 'rmoo-mcp-output-function)
-    (setq rmoo-mcp-current-tag _data-tag)
-    (setq rmoo-mcp-current-reference (concat "reference: \"" reference "\" type: \"" type "\" content*: \"\" _data-tag: " _data-tag))
+    (setq rmoo-mcp-intermediaries (cons (cons "_data-tag" _data-tag) rmoo-mcp-intermediaries))
+    (setq rmoo-mcp-intermediaries (cons (cons "reference" (concat "reference: \"" reference "\" type: \"" type "\" content*: \"\" _data-tag: " _data-tag)) rmoo-mcp-intermediaries))
     (erase-buffer)
     (setq rmoo-mcp-cleanup-function
           (cond
@@ -204,19 +197,15 @@
 ;; to have this responsibility lie elsewhere.
 ;;
 (defun rmoo-mcp-common-editor-functions ()
-    (goto-char (point-max))
-    (goto-char (point-min))
-    (setq rmoo-select-buffer (current-buffer))
-    (display-buffer (current-buffer) t)
-    (setq rmoo-world-here world)
-    (put rmoo-world-here 'goto-function 'switch-to-buffer-other-window)
-    (put rmoo-world-here 'goto-buffer (current-buffer))
-    (setq-local rmoo-mcp-tag rmoo-mcp-current-tag)
-    (setq-local rmoo-mcp-reference rmoo-mcp-current-reference)
-    (setq-local rmoo-mcp-key rmoo-mcp-current-key)
-    (setq rmoo-mcp-current-key nil)
-    (setq rmoo-mcp-current-tag nil)
-    (setq rmoo-mcp-current-reference nil))
+  (goto-char (point-max))
+  (goto-char (point-min))
+  (setq rmoo-select-buffer (current-buffer))
+  (display-buffer (current-buffer) t)
+  (setq rmoo-world-here world)
+  (put rmoo-world-here 'goto-function 'switch-to-buffer-other-window)
+  (put rmoo-world-here 'goto-buffer (current-buffer))
+  (setq-local rmoo-mcp-data rmoo-mcp-intermediaries)
+  (setq rmoo-mcp-intermediaries nil))
 
 (defun rmoo-mcp-cleanup-edit-program ()
   (let ((world rmoo-world-here))
@@ -315,14 +304,14 @@
   ;; Ignore MCP_snoop
   (if (not (string-match "^S->C.*" line))
     (progn
-      (cond ((string= (concat "#$#: " rmoo-mcp-current-tag) line)
+      (cond ((string= (concat "#$#: " (cdr (assoc "_data-tag" rmoo-mcp-intermediaries))) line)
              (progn
                (set-buffer (get rmoo-world-here 'output-buffer))
                (funcall rmoo-mcp-cleanup-function)
                (rmoo-output-function-return-control-to-last)
                (rmoo-set-output-buffer-to-last)
                'rmoo-mcp-nil-function))
-            ((eq (string-match (concat "#$#\\* " rmoo-mcp-current-tag " content: ") line) 0)
+            ((eq (string-match (concat "#$#\\* " (cdr (assoc "_data-tag" rmoo-mcp-intermediaries)) " content: ") line) 0)
              (setq line (substring line (match-end 0)))
              (set-buffer (get rmoo-world-here 'output-buffer))
              (let ((start (point))

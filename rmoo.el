@@ -709,14 +709,14 @@ on the last line of the buffer.")
 
 (defun rmoo-upload-buffer-directly ()
   (interactive)
-  (if (boundp 'rmoo-mcp-reference)
+  (if (boundp 'rmoo-mcp-data)
     (progn 
-    (rmoo-send-here (concat "#$#dns-org-mud-moo-simpleedit-set " rmoo-mcp-key " " rmoo-mcp-reference))
+    (rmoo-send-here (concat "#$#dns-org-mud-moo-simpleedit-set " (cdr (assoc "auth-key" rmoo-mcp-data)) " " (cdr (assoc "reference" rmoo-mcp-data))))
     (goto-char (point-min))
     (while (not (eobp))
-           (rmoo-send-here (concat "#$#* " rmoo-mcp-tag " content: " (buffer-substring-no-properties (point) (line-end-position))))
+           (rmoo-send-here (concat "#$#* " (cdr (assoc "_data-tag" rmoo-mcp-data)) " content: " (buffer-substring-no-properties (point) (line-end-position))))
            (forward-line 1))
-    (rmoo-send-here (concat "#$#: " rmoo-mcp-tag)))
+    (rmoo-send-here (concat "#$#: " (cdr (assoc "_data-tag" rmoo-mcp-data)))))
   (rmoo-send-here (buffer-string))))
 
 (defun rmoo-append-to-logfile (log-text)
