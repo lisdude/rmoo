@@ -24,7 +24,6 @@
 (defvar rmoo-status-text "Status"
   "The text currently appended to the status line.")
 
-;; TODO: Combine these intermediary variables into a list
 (defvar rmoo-mcp-intermediaries nil
   "An intermediary associated list used to temporarily store information needed in editor buffers.")
 
