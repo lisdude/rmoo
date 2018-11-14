@@ -50,7 +50,7 @@ Once you @edit a verb, the screen will split in half with your verb code on one 
 | `C-j`     | Add a newline and indent.                            |
 | `C-c C-c` | Comment out the selection.                           |
 | `C-c C-u` | Uncomment the selection.                             |
-|           |                                                      |
+| `C-c ]`   | Kill editor buffer and close the frame.              |
 
 ### Commands and Keybindings
 | Command                | Keybinding    | Effect                                                                                                                                                                                                              |
@@ -75,7 +75,8 @@ These are some settings you can put in your general Emacs settings to enhance yo
 | `(setq write-region-inhibit-fsync t)`                     | Disable fsync, which vastly speeds up writing to log files at the expense of safety in the event of a crash. |
 | `(evil-set-initial-state 'rmoo-interactive-mode 'insert)` | Start MOOcode mode in insert mode when using evil.                                                           |
 | `(evil-set-initial-state 'rmoo-scratch-mode 'insert)`     | Start MOO scratch buffers in insert mode.                                                                    |
-| `(setq rmoo-connect-function 'socks-open-network-stream)` | Use a SOCKS proxy for connecting to MOOs. See the 'Proxy' section.                                           |
+| `(setq rmoo-connect-function 'socks-open-network-stream)` | Use a SOCKS proxy for connecting to MOOs.                                                                    |
+| `(setq rmoo-mcp-record-unknown t)`                        | Create a buffer to record unrecognizable MCP data instead of just ignoring it.                               |
 
 ### Window Management
 | Command | Effect                                                                                         |
@@ -85,7 +86,7 @@ These are some settings you can put in your general Emacs settings to enhance yo
 | `C-x b` | Display a list of buffers to open in current pane. This is useful when editing multiple verbs. |
 | `C-x 3` | Split the screen vertically. Typically followed by `C-x b` to open a buffer.                   |
 | `C-x 2` | Split the screen horizontally.                                                                 |
-| `C-x k` | Select a buffer to close entirely.                                                                                               |
+| `C-x k` | Select a buffer to close entirely.                                                             |
 
 ### Changelog
 __Version 1.2 (November 13, 2018)__
