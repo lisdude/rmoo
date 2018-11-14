@@ -14,7 +14,7 @@ The simplest way to install, in my opinion:
 (require 'rmoo-autoload)
 (require 'moocode-mode)
 (global-set-key (kbd "C-c C-r") 'rmoo)
-(add-to-list 'auto-mode-alist '("\\.moo$" . moocode-mode)) 
+(add-to-list 'auto-mode-alist '("\\.moo$" . moocode-mode))
 (add-hook 'rmoo-interactive-mode-hooks (lambda ()
 (linum-mode -1)                  ;; ... no line numbers
 (goto-address-mode t)))          ;; ... clickable links
@@ -77,6 +77,10 @@ These are some settings you can put in your general Emacs settings to enhance yo
 | `(evil-set-initial-state 'rmoo-scratch-mode 'insert)`     | Start MOO scratch buffers in insert mode.                                                                    |
 | `(setq rmoo-connect-function 'socks-open-network-stream)` | Use a SOCKS proxy for connecting to MOOs.                                                                    |
 | `(setq rmoo-mcp-record-unknown t)`                        | Create a buffer to record unrecognizable MCP data instead of just ignoring it.                               |
+| `(setq rmoo-input-history-size 50)`                       | Set the number of lines of input history that RMOO will remember.                                            |
+| `(setq rmoo-worlds-max-worlds 100)`                       | The maximum number of MOO worlds that can exist.                                                             |
+| `(setq rmoo-send-always-goto-end t)`                      | When true, RMOO will always jump to the end of the buffer after sending a line.                              |
+| `(setq rmoo-send-require-last-line t)`                    | When true, RMOO will only send lines on the last line of the buffer.                                         |
 
 ### Window Management
 | Command | Effect                                                                                         |
