@@ -21,9 +21,6 @@
                                        "\\( +\\|$\\)")
   "Recognize one keyword: value pair.")
 
-(defvar rmoo-status-text "Status"
-  "The text currently appended to the status line.")
-
 (defvar rmoo-mcp-intermediaries nil
   "An intermediary associated list used to temporarily store information needed in editor buffers.")
 
@@ -273,12 +270,17 @@
                    'rmoo-mcp-do-status
                    "1.0"
                    "1.0"
-                   nil)
+                   'rmoo-mcp-init-status)
+
+(defun rmoo-mcp-init-status (proc)
+  (make-local-variable 'mode-line-misc-info))
+
 
 (defun rmoo-mcp-do-status (text)
-  (delete rmoo-status-text mode-line-misc-info)
+  (if (boundp 'rmoo-status-text)
+  (delete rmoo-status-text mode-line-misc-info))
   (add-to-list 'mode-line-misc-info text 'APPEND)
-  (setq rmoo-status-text text))
+  (setq-local rmoo-status-text text))
 
 (rmoo-mcp-register "dns-com-vmoo-client" '() 'rmoo-mcp-do-client "1.0" "1.0" 'rmoo-mcp-initialize-client)
 
