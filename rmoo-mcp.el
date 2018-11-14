@@ -27,6 +27,9 @@
 (defvar rmoo-mcp-intermediaries nil
   "An intermediary associated list used to temporarily store information needed in editor buffers.")
 
+(defvar rmoo-mcp-record-unknown nil
+  "Whether or not unrecognized MCP data will get added to a new 'unknown data' buffer.")
+
 (defvar rmoo-mcp-cleanup-function nil)
 
 (defun rmoo-mcp-init-connection ()
@@ -62,7 +65,7 @@
   (nth 5 entry))
 
 (defun rmoo-mcp-handle-unknown (request data-follows)
-  (if data-follows
+  (if (and data-follows rmoo-mcp-record-unknown)
     (let* ((start (point))
            (line (progn
                    (beginning-of-line 2)
