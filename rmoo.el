@@ -705,7 +705,7 @@ on the last line of the buffer.")
 (defun rmoo-upload-buffer-directly ()
   (interactive)
   (if (boundp 'rmoo-mcp-data)
-    (progn 
+    (save-excursion
     (rmoo-send-here (concat "#$#dns-org-mud-moo-simpleedit-set " (cdr (assoc "auth-key" rmoo-mcp-data)) " " (cdr (assoc "reference" rmoo-mcp-data))))
     (goto-char (point-min))
     (while (not (eobp))
