@@ -273,7 +273,6 @@
                    nil)
 
 (defun rmoo-mcp-do-status (text)
-  (rmoo-mcp-remove-line)
   (delete rmoo-status-text mode-line-misc-info)
   (add-to-list 'mode-line-misc-info text 'APPEND)
   (setq rmoo-status-text text))
