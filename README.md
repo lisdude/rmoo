@@ -106,9 +106,10 @@ __Version 1.2 (November 13, 2018)__
     - dns-org-mud-moo-simpleedit
     - dns-com-awns-status
     - dns-com-vmoo-client
+- Made settings visible by adding an 'rmoo' group to `M-x customize-group`.
 
 __Earlier Versions__
 - See [CREDITS.txt](CREDITS.txt) for original changelogs and version control notes.
 
 ### Authors
-[Ron Tapia](http://www.nmia.com/~tapia/) <[tapia@nmia.com](mailto:tapia@nmia.com)>, [Matthew Campbell](http://www.pobox.com/~mattcampbell/) <[mattcampbell@pobox.com](mailto:mattcampbell@pobox.com)>, [lisdude](https://www.lisdude.com) <[lisdude@lisdude.com](mailto:lisdude@lisdude.com)>
+[Ron Tapia](http://www.nmia.com/~tapia/) <[tapia@nmia.com](mailto:tapia@nmia.com)>, [Matthew Campbell](http://www.pobox.com/~mattcampbell/) <[mattcampbell@pobox.com](mailto:mattcampbell@pobox.com)>, [Todd Sundsted](https://github.com/toddsundsted), [lisdude](https://www.lisdude.com) <[lisdude@lisdude.com](mailto:lisdude@lisdude.com)>
