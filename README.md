@@ -68,7 +68,7 @@ Once you @edit a verb, the screen will split in half with your verb code on one 
 |                        |               |                                                                                                                                                                                                                     |
 
 ### Miscellaneous Settings
-These are some settings you can put in your general Emacs settings to enhance your rmoo experience.
+These are some settings you can put in your Emacs init file to enhance your rmoo experience. RMOO-specific settings can be configured from within Emacs by typing `M-x customize-group`, `rmoo`.
 
 | Setting                                                   | Effect                                                                                                       |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |

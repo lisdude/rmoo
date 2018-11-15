@@ -13,6 +13,7 @@
 ;; Most of the global variables.
 ;;
 (defvar rmoo-version "1.2")
+(defgroup rmoo nil "Customization options for RMOO MOO client.")
 (defvar rmoo-world-here nil "The moo world associated with this buffer.")
 (make-variable-buffer-local 'rmoo-world-here)
 (defvar rmoo-prompt ">" "The prompt to use for this moo.\nTaken from the prompt property of a moo world.")
@@ -20,12 +21,13 @@
 (defvar rmoo-handle-text-hooks nil "A list of hooks run every time that output from a MOO is entered in a moo interactive buffer.")
 (defvar rmoo-interactive-mode-syntax-table nil "Syntax table for use with MOO interactive mode.")
 (defvar rmoo-interactive-mode-hooks nil "A list of hooks run when a buffer changes to MOO interactive mode.")
-(defvar rmoo-autologin t "If a world has a login property, use it to automatically connect when rmoo is run.")
+(defcustom rmoo-autologin t "If a world has a login property, use it to automatically connect when rmoo is run." :group 'rmoo :type 'boolean)
 (defvar rmoo-tls nil "Indicate whether a connection should use TLS.\nTaken from the tls property of a MOO world.")
+(make-variable-buffer-local 'rmoo-tls)
 (defvar rmoo-logfile nil "The path of the world's log file\nTaken from the logfile property of a MOO world.")
 (make-variable-buffer-local 'rmoo-logfile)
-(make-variable-buffer-local 'rmoo-tls)
 (defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo :type 'function)
+(defcustom rmoo-local-echo-color "#FFA500" "The color applied to the text that echos your input back to you." :group 'rmoo :type 'color)
 (defvar rmoo-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'rmoo-send)
@@ -294,7 +296,7 @@ Keymap:
 
 ;;;###autoload
 (defun rmoo-worlds-add-new-moo (name site port tls logfile)
-  (interactive "sWorld name: \nsSite: \nnPort: \nsTLS/SSL? \nsLog File Path: ")
+  (interactive "sWorld name: \nsSite: \nnPort: \ncTLS/SSL? \nsLog File Path: ")
   (if (string="y" tls)
     (setq tls 'tls)
     (setq tls 'network))
@@ -356,8 +358,7 @@ Keymap:
 ;;;
 ;;; Input History Maintenance
 ;;;
-(defvar rmoo-input-history-size 30
-  "The number of past input commands remembered for possible reuse")
+(defcustom rmoo-input-history-size 30 "The number of lines to remember in input history." :group 'rmoo :type 'integer)
 
 (defvar rmoo-input-history nil)
 
@@ -498,7 +499,7 @@ Keymap:
 
 (defun rmoo-request-tls-maybe (world)
   (or (get world 'tls)
-      (read-string "TLS/SSL? ")))
+      (read-char "TLS/SSL? ")))
 
 (defun rmoo-request-logfile-maybe (world)
   (or (get world 'logfile)
@@ -585,13 +586,9 @@ Keymap:
 
 (defvar rmoo-send-functions nil "A list of functions called everytime a line of input is send to a MOO process as a command in rmoo-interactive-mode. Each function is called with one argument, the line to be sent.")
 
-(defvar rmoo-send-always-goto-end nil
-  "Indicates that RMOO should always go to the buffer after sending a line,
-no matter where in the buffer the user was.")
+(defcustom rmoo-send-always-goto-end nil "Indicates that RMOO should always go to the buffer after sending a line, no matter where in the buffer the user was." :group 'rmoo :type 'boolean)
 
-(defvar rmoo-send-require-last-line nil
-  "Indicates that RMOO should refuse to send what you type if you are not
-on the last line of the buffer.")
+(defcustom rmoo-send-require-last-line nil  "Indicates that RMOO should refuse to send what you type if you are not on the last line of the buffer." :group 'rmoo :type 'boolean)
 
 (defun rmoo-send ()
   "Send current line of input to a MOO (rmoo-world-here)."
@@ -612,7 +609,7 @@ on the last line of the buffer.")
     		  (line (buffer-substring (point) end))
 		  (funcs rmoo-send-functions)
 		  func)
-   	     (add-text-properties (+ (line-beginning-position) (length rmoo-prompt)) (line-end-position) '(font-lock-face ((foreground-color . "#FFA500"))))
+  	     (add-face-text-property (+ (line-beginning-position) (length rmoo-prompt)) (line-end-position) (cons 'foreground-color rmoo-local-echo-color))
 	     (rmoo-send-here line)
 	     (cond ((save-excursion
 		      (end-of-line)

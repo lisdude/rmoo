@@ -24,8 +24,7 @@
 (defvar rmoo-mcp-intermediaries nil
   "An intermediary associated list used to temporarily store information needed in editor buffers.")
 
-(defvar rmoo-mcp-record-unknown nil
-  "Whether or not unrecognized MCP data will get added to a new 'unknown data' buffer.")
+(defcustom rmoo-mcp-record-unknown nil "Whether or not unrecognized MCP data will get added to a new 'unknown data' buffer." :group 'rmoo :type 'boolean)
 
 (defvar rmoo-mcp-cleanup-function nil)
 
