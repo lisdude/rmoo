@@ -3,6 +3,7 @@
 The following documents how to get RMOO up and running for the complete beginner. If you're unfamiliar with Emacs, the conventions used may be a bit odd. Here's a quick rundown of how commands are presented:
 
 When prefixed with a C-, that means hold down CTRL and the letter following C-. e.g. `C-w` means hold down CTRL while pressing w.
+
 When prefixed with an M-, that means your meta key. Typically this is your Windows or Option key. e.g. `M-x` means to hold down meta while pressing x. (This will often be followed by a full string. M-x allows you to run commands by typing them in.)
 
 ### Installation
@@ -93,6 +94,9 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 | `C-x k` | Select a buffer to close entirely.                                                             |
 
 ### Changelog
+__Version 1.3__
+- Add UTF-8 support.
+
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.
 - Add support for SSL/TLS connections.
