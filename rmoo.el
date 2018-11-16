@@ -296,7 +296,7 @@ Keymap:
 
 ;;;###autoload
 (defun rmoo-worlds-add-new-moo (name site port tls logfile)
-  (interactive "sWorld name: \nsSite: \nnPort: \ncTLS/SSL? \nsLog File Path: ")
+  (interactive "sWorld name: \nsSite: \nnPort: \nsTLS/SSL? \nsLog File Path: ")
   (if (string="y" tls)
     (setq tls 'tls)
     (setq tls 'network))
@@ -499,7 +499,7 @@ Keymap:
 
 (defun rmoo-request-tls-maybe (world)
   (or (get world 'tls)
-      (read-char "TLS/SSL? ")))
+      (read-string "TLS/SSL? ")))
 
 (defun rmoo-request-logfile-maybe (world)
   (or (get world 'logfile)
