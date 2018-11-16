@@ -146,7 +146,8 @@ Keymap:
 		  (setq rmoo-output (cdr rmoo-output))
 		  (while rmoo-output
 		    (set-buffer (process-buffer proc))
-		    (setq line (xterm-color-filter (car rmoo-output)))
+            (setq line (decode-coding-string (car rmoo-output) 'latin-9 t))
+		    (setq line (xterm-color-filter line))
 		    (setq rmoo-output (cdr rmoo-output))
 		    (funcall (get rmoo-world-here 'output-function) line))))
 	      (if moving (goto-char (process-mark proc))))
