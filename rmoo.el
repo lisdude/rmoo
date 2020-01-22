@@ -359,7 +359,7 @@ Keymap:
 ;;;
 ;;; Input History Maintenance
 ;;;
-(defcustom rmoo-input-history-size 30 "The number of lines to remember in input history." :group 'rmoo :type 'integer)
+(defcustom rmoo-input-history-size 150 "The number of lines to remember in input history." :group 'rmoo :type 'integer)
 
 (defvar rmoo-input-history nil)
 
