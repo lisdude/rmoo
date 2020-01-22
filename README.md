@@ -62,6 +62,7 @@ Once you @edit a verb, the screen will split in half with your verb code on one 
 | `rmoo-@paste-kill`     | `C-c C-p`     | @paste whatever is in the 'kill ring'.                                                                                                                                                                              |
 | `rmoo-set-linelength`  | `C-c C-l`     | Automatically set @linelength based on the size of your Emacs window.                                                                                                                                               |
 | `rmoo-clear-input`     | `M-backspace` | Delete the contents of the command line and, if scrolled up, jump back to the command line.                                                                                                                         |
+| `rmoo-jump-to-last-input` | `M-space` | Jump to the spot in the buffer where you last sent a command. |
 | `rmoo-up-command`      | `Up Arrow`    | Recall command history. Can also be summoned with `Esc-p`                                                                                                                                                           |
 | `rmoo-down-command`    | `Down Arrow`  | Same as up arrow, only opposite direction. Can also be summoned with `Esc-n`                                                                                                                                        |
 | `rmoo-extras-get-verb` | `C-c C-v`     | Prompts for a verb name to edit in the local editor.                                                                                                                                                                |
@@ -96,6 +97,7 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 ### Changelog
 __Version 1.3__
 - Add UTF-8 support.
+- Add `M-space` to jump to your last command in the buffer.
 
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.
