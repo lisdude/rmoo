@@ -5,7 +5,7 @@
 ;;                  lisdude <lisdude@lisdude.com>
 ;;
 (provide 'rmoo)
-(require 'cl)
+(require 'cl-lib)
 (require 'comint) ; All that's needed from comint is comint-read-noecho.
 (require 'xterm-color)
 
