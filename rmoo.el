@@ -37,11 +37,13 @@
     (define-key map "\^c\^y" 'rmoo-send-kill)
     (define-key map "\^c\^w" 'rmoo-worlds-map)
     (define-key map [backspace] 'rmoo-backspace)
+    (define-key map "\^?" 'rmoo-backspace) ;; macOS Terminal
     (define-key map (kbd "C-c C-l") 'rmoo-set-linelength)
     (define-key map (kbd "M-DEL") 'rmoo-clear-input)
     (define-key map [up] 'rmoo-up-command)
     (define-key map [down] 'rmoo-down-command)
     (define-key map [home] 'rmoo-beginning-of-line)
+    (define-key map (kbd "M-SPC") 'rmoo-jump-to-last-input)
     map)
   "Keymap for MOO Interactive Mode.")
 
@@ -148,6 +150,7 @@ Keymap:
 		    (set-buffer (process-buffer proc))
             (setq line (decode-coding-string (car rmoo-output) 'latin-9 t))
 		    (setq line (xterm-color-filter line))
+;;            (set-text-properties line `(help-echo "TIMESTAMP"))
 		    (setq rmoo-output (cdr rmoo-output))
 		    (funcall (get rmoo-world-here 'output-function) line))))
 	      (if moving (goto-char (process-mark proc))))
@@ -409,14 +412,17 @@ Keymap:
 (defun rmoo-initialize-input-history ()
   (make-local-variable 'rmoo-input-history)
   (make-local-variable 'rmoo-input-index)
+  (make-local-variable 'rmoo-last-input-pos)
   (setq rmoo-input-history (rmoo-make-history rmoo-input-history-size))
-  (setq rmoo-input-index 0))
+  (setq rmoo-input-index 0)
+  (setq rmoo-last-input-pos (point)))
 
 (defun rmoo-remember-input (string)
   (if (not (string= string ""))
     (progn
       (rmoo-history-insert rmoo-input-history string)
-      (rmoo-append-to-logfile (concat rmoo-prompt string)))))
+      (rmoo-append-to-logfile (concat rmoo-prompt string))
+      (setq rmoo-last-input-pos (point)))))
 
 (defun rmoo-previous-command ()
   (interactive)
@@ -477,6 +483,14 @@ Keymap:
 (defun rmoo-previous-matching-command ()
   (interactive)
   (rmoo-match-input-history -1))
+
+(defun rmoo-jump-to-last-input ()
+  "Jump to line after your last command was sent."
+  (interactive)
+  (goto-char rmoo-last-input-pos)
+  (rmoo-beginning-of-line)
+  (if (= scroll-step 1)
+      (recenter -1)))
 
 (add-hook 'rmoo-interactive-mode-hooks 'rmoo-initialize-input-history)
 (add-hook 'rmoo-send-functions 'rmoo-remember-input)
