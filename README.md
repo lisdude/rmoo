@@ -83,6 +83,7 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 | `(setq rmoo-worlds-max-worlds 100)`                       | The maximum number of MOO worlds that can exist.                                                             |
 | `(setq rmoo-send-always-goto-end t)`                      | When true, RMOO will always jump to the end of the buffer after sending a line.                              |
 | `(setq rmoo-send-require-last-line t)`                    | When true, RMOO will only send lines on the last line of the buffer.                                         |
+| `(setq rmoo-clear-local f)`                               | When false, RMOO will not clear any existing command history when reconnecting from an existing buffer.      |
 
 ### Window Management
 | Command | Effect                                                                                         |
@@ -98,6 +99,8 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 __Version 1.3 (In Progress)__
 - Add UTF-8 support.
 - Add `M-space` to jump to your last command in the buffer.
+- Add an option to retain command history across connections in the same buffer.
+- Fix an issue where reconnecting from an existing buffer would duplicate the contents of that buffer, eventually leading to a crash after several reconnections.
 
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.

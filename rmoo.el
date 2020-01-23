@@ -28,6 +28,7 @@
 (make-variable-buffer-local 'rmoo-logfile)
 (defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo :type 'function)
 (defcustom rmoo-local-echo-color "#FFA500" "The color applied to the text that echos your input back to you." :group 'rmoo :type 'color)
+(defcustom rmoo-clear-local t "Clear local variables (including command recall) when connecting to a new world in an existing buffer." :group 'rmoo :type 'boolean)
 (defvar rmoo-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'rmoo-send)
@@ -104,7 +105,8 @@ Keymap:
   (interactive (rmoo-request-world))
   (if (null (get world 'process))
       (error "No process"))
-  (kill-all-local-variables)
+(if rmoo-clear-local
+  (kill-all-local-variables))
   (setq rmoo-world-here world)
   (set-process-filter (get world 'process) 'rmoo-filter)
   (setq mode-name "RMOO")
@@ -408,12 +410,14 @@ Keymap:
 	(aref vec (% (+ head i) (length vec)))))))
 
 (defun rmoo-initialize-input-history ()
+  (if (or (null rmoo-input-history) rmoo-clear-local)
+  (progn
   (make-local-variable 'rmoo-input-history)
   (make-local-variable 'rmoo-input-index)
   (make-local-variable 'rmoo-last-input-pos)
   (setq rmoo-input-history (rmoo-make-history rmoo-input-history-size))
   (setq rmoo-input-index 0)
-  (setq rmoo-last-input-pos (point)))
+  (setq rmoo-last-input-pos (point)))))
 
 (defun rmoo-remember-input (string)
   (if (not (string= string ""))
@@ -491,6 +495,7 @@ Keymap:
     (evil-normal-state nil)))
 
 (add-hook 'rmoo-interactive-mode-hooks 'rmoo-initialize-input-history)
+(add-hook 'rmoo-interactive-mode-hooks 'rmoo-clear-input)
 (add-hook 'rmoo-send-functions 'rmoo-remember-input)
 
 (define-key rmoo-interactive-mode-map "\ep" 'rmoo-previous-command)
