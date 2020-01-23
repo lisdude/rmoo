@@ -12,7 +12,7 @@
 ;;
 ;; Most of the global variables.
 ;;
-(defvar rmoo-version "1.2")
+(defvar rmoo-version "1.3b")
 (defgroup rmoo nil "Customization options for RMOO MOO client.")
 (defvar rmoo-world-here nil "The moo world associated with this buffer.")
 (make-variable-buffer-local 'rmoo-world-here)
@@ -687,6 +687,8 @@ Keymap:
 (defun rmoo-clear-input ()
   "Jump to the input line and delete whatever is there."
   (interactive)
+  (if (and (bound-and-true-p evil-mode) (eq evil-state 'normal))
+    (evil-insert-state nil))
   (goto-char (point-max))
   (rmoo-beginning-of-line)
   (if (= scroll-step 1)
