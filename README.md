@@ -1,4 +1,4 @@
-# RMOO 1.2
+# RMOO 1.3
 
 The following documents how to get RMOO up and running for the complete beginner. If you're unfamiliar with Emacs, the conventions used may be a bit odd. Here's a quick rundown of how commands are presented:
 
@@ -95,7 +95,7 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 | `C-x k` | Select a buffer to close entirely.                                                             |
 
 ### Changelog
-__Version 1.3__
+__Version 1.3 (In Progress)__
 - Add UTF-8 support.
 - Add `M-space` to jump to your last command in the buffer.
 
