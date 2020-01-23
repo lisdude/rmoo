@@ -489,8 +489,8 @@ Keymap:
   (interactive)
   (goto-char rmoo-last-input-pos)
   (rmoo-beginning-of-line)
-  (if (= scroll-step 1)
-      (recenter -1)))
+  (if (and (bound-and-true-p evil-mode) (not (eq evil-state 'normal)))
+    (evil-normal-state nil)))
 
 (add-hook 'rmoo-interactive-mode-hooks 'rmoo-initialize-input-history)
 (add-hook 'rmoo-send-functions 'rmoo-remember-input)
