@@ -9,7 +9,7 @@ When prefixed with an M-, that means your meta key. Typically this is your Windo
 ### Installation
 The simplest way to install, in my opinion:
 1. `git clone https://github.com/lisdude/rmoo.git ~/.emacs.d/rmoo`
-2. `git clone https://github.com/atomontage/xterm-color ~/.emacs/xterm-color`
+2. `git clone https://github.com/atomontage/xterm-color.git ~/.emacs.d/xterm-color`
 3. Add the following to your configuration file:
 ```
 (add-to-list 'load-path "~/.emacs.d/xterm-color")
