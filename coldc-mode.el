@@ -21,9 +21,25 @@
 (defconst xemacsp (string-match "Lucid\\|XEmacs" emacs-version)
   "Non nil if using XEmacs.")
 
+;; Keymap
+(defvar coldc-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-j" 'newline-and-indent)
+    (define-key map (kbd "C-c c") 'rmoo-upload-and-destroy)
+    (define-key map (kbd "C-c s") 'rmoo-upload-buffer-directly)
+    (define-key map (kbd "<f7>") 'rmoo-upload-buffer-directly)
+    (define-key map (kbd "<f8>") 'rmoo-resize-editor-frame)
+    (define-key map (kbd "C-c ]") 'rmoo-destroy)
+    (define-key map (kbd "C-c C-c") 'rmoo-code-commentify)
+    (define-key map (kbd "C-c C-u") 'rmoo-code-uncommentify)
+    map)
+  "Keymap for ColdC major mode.")
+
 ;;;###autoload
 (define-derived-mode coldc-mode c-mode "ColdC"
   "Major mode for editing ColdC code.\n\n{coldc-mode-map}"
+
+  (use-local-map coldc-mode-map)
 
   (setq comment-start "// "
 	comment-end   "")
