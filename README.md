@@ -16,6 +16,7 @@ The simplest way to install, in my opinion:
 (add-to-list 'load-path "~/.emacs.d/rmoo")
 (require 'rmoo-autoload)
 (require 'moocode-mode)
+(require 'coldc-mode)
 (global-set-key (kbd "C-c C-r") 'rmoo)
 (add-to-list 'auto-mode-alist '("\\.moo$" . moocode-mode))
 (add-hook 'rmoo-interactive-mode-hooks (lambda ()
@@ -103,6 +104,7 @@ __Version 1.3 (In Progress)__
 - Add `M-space` to jump to your last command in the buffer.
 - Add an option to retain command history across connections in the same buffer.
 - Fix an issue where reconnecting from an existing buffer would duplicate the contents of that buffer, eventually leading to a crash after several reconnections.
+- Add minimal support for ColdC worlds. (At the moment, this only affects which mode LambdaMOO-style local editing will invoke.)
 
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.
