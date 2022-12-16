@@ -51,7 +51,7 @@
 
 (defun rmoo-local-edit-cleanup-function ()
   (let ((world rmoo-world-here))
-    (if 'rmoo-coldc
+    (if (get world 'coldc)
         (coldc-mode)
         (moocode-mode))
     (setq rmoo-world-here world)
