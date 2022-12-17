@@ -36,8 +36,10 @@
     (setq rmoo-world-here world)
     (rmoo-scratch-mode)
     (goto-char (point-min))
-    (insert-before-markers (concat command "\n\n."))
-    (backward-char 2)
+    (if (not (equal "" command))
+        (progn
+        (insert-before-markers (concat command "\n\n."))
+        (backward-char 2)))
     (if rmoo-scratch-use-new-frame
       (make-frame)
       (switch-to-buffer-other-window (current-buffer)))))
