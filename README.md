@@ -105,6 +105,7 @@ __Version 1.3 (In Progress)__
 - Add an option to retain command history across connections in the same buffer.
 - Fix an issue where reconnecting from an existing buffer would duplicate the contents of that buffer, eventually leading to a crash after several reconnections.
 - Add minimal support for ColdC worlds. (At the moment, this only affects which mode LambdaMOO-style local editing will invoke.)
+- Update moocode-mode to add new types and built-in functions from ToastStunt.
 
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.
