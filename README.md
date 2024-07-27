@@ -87,6 +87,7 @@ These are some settings you can put in your Emacs init file to enhance your rmoo
 | `(setq rmoo-send-always-goto-end t)`                      | When true, RMOO will always jump to the end of the buffer after sending a line.                              |
 | `(setq rmoo-send-require-last-line t)`                    | When true, RMOO will only send lines on the last line of the buffer.                                         |
 | `(setq rmoo-clear-local f)`                               | When false, RMOO will not clear any existing command history when reconnecting from an existing buffer.      |
+| `(setq rmoo-convert-utf-to-ascii t)`                      | When true, common UTF characters will be converted to their ASCII equivalents.                               |
 
 ### Window Management
 | Command | Effect                                                                                         |
@@ -106,6 +107,7 @@ __Version 1.3 (In Progress)__
 - Fix an issue where reconnecting from an existing buffer would duplicate the contents of that buffer, eventually leading to a crash after several reconnections.
 - Add minimal support for ColdC worlds. (At the moment, this only affects which mode LambdaMOO-style local editing will invoke.)
 - Update moocode-mode to add new types and built-in functions from ToastStunt.
+- Convert common UTF characters to ASCII when sending commands.
 
 __Version 1.2 (November 13, 2018)__
 - Add 256-color ANSI support.

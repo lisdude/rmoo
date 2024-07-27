@@ -29,6 +29,8 @@
 (defcustom rmoo-connect-function 'open-network-stream "The function called to open a network connection.\nThis is useful if, for instance, you want to use a SOCKS proxy by replacing the connection function with something like socks-open-network-stream." :group 'rmoo :type 'function)
 (defcustom rmoo-local-echo-color "#FFA500" "The color applied to the text that echos your input back to you." :group 'rmoo :type 'color)
 (defcustom rmoo-clear-local t "Clear local variables (including command recall) when connecting to a new world in an existing buffer." :group 'rmoo :type 'boolean)
+(defcustom rmoo-convert-utf-to-ascii t "Convert common UTF characters to their ASCII equivalents when sending commands." :group 'rmoo :type 'boolean)
+
 (defvar rmoo-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'rmoo-send)
@@ -592,9 +594,49 @@ Keymap:
   (if (/= (current-column) (length rmoo-prompt))
       (delete-char -1)))
 
+(defvar utf-to-ascii-table
+  (let ((table (make-hash-table :test 'equal)))
+    (puthash "“" "\"" table)
+    (puthash "”" "\"" table)
+    (puthash "„" "\"" table)
+    (puthash "«" "\"" table)
+    (puthash "»" "\"" table)
+    (puthash "‘" "'" table)
+    (puthash "’" "'" table)
+    (puthash "‚" "'" table)
+    (puthash "‹" "'" table)
+    (puthash "›" "'" table)
+    (puthash "—" "-" table)
+    (puthash "–" "-" table)
+    (puthash "‒" "-" table)
+    (puthash "−" "-" table)
+    (puthash "…" "..." table)
+    (puthash "•" "*" table)
+    (puthash "‣" "*" table)
+    (puthash "⁃" "-" table)
+    (puthash " " " " table) ;; Non-breaking space
+    (puthash "°" " degrees" table)
+    (puthash "×" "x" table)
+    (puthash "±" "+/-" table)
+    table)
+  "Hash table for converting UTF characters to ASCII equivalents.")
+
+(defvar utf-to-ascii-regex
+  (regexp-opt (hash-table-keys utf-to-ascii-table))
+  "Regex for UTF to ASCII conversion.")
+
+(defun utf-to-ascii (string)
+  "Convert UTF characters to their ASCII equivalents."
+  (replace-regexp-in-string utf-to-ascii-regex
+                            (lambda (match) (gethash match utf-to-ascii-table))
+                            string))
+
 (defun rmoo-send-string (string proc)
-  "Send STRING as input to PROC"
-  (comint-send-string proc (concat string "\n")))
+  "Send STRING as input to PROC, converting UTF characters to ASCII when rmoo-convert-utf-to-ascii is enabled."
+  (let ((converted-string (if rmoo-convert-utf-to-ascii
+                            (utf-to-ascii string)
+                            string)))
+    (comint-send-string proc (concat converted-string "\n"))))
 
 (defun rmoo-eobp ()
   (cond ((eobp)
@@ -669,7 +711,7 @@ Keymap:
 
 (defun rmoo-send-here (string)
   "Send STRING as input to rmoo-world-here."
-  (comint-send-string (get rmoo-world-here 'process) (concat string "\n")))
+  (rmoo-send-string string (get rmoo-world-here 'process)))
 
 (defun rmoo-recenter ()
   "If we should recenter, recenter."
