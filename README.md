@@ -7,6 +7,7 @@ When prefixed with a C-, that means hold down CTRL and the letter following C-. 
 When prefixed with an M-, that means your meta key. Typically this is your Windows or Option key. e.g. `M-x` means to hold down meta while pressing x. (This will often be followed by a full string. M-x allows you to run commands by typing them in.)
 
 ### Installation
+#### Pre-Emacs 29.1
 The simplest way to install, in my opinion:
 1. `git clone https://github.com/lisdude/rmoo.git ~/.emacs.d/rmoo`
 2. `git clone https://github.com/atomontage/xterm-color.git ~/.emacs.d/xterm-color`
@@ -22,6 +23,26 @@ The simplest way to install, in my opinion:
 (add-hook 'rmoo-interactive-mode-hooks (lambda ()
 (linum-mode -1)                  ;; ... no line numbers
 (goto-address-mode t)))          ;; ... clickable links
+```
+
+#### Post-Emacs 29.1
+The latest version of Emacs bundles the very useful `use-package`,
+and also deprecates `linum-mode`, so some changes seem like a good idea.
+
+1. `git clone https://github.com/lisdude/rmoo.git ~/lib/emacs/rmoo`
+2. (In Emacs) M-: `(package-install "xterm-color")`
+3. Add the following to your configuration file:
+```
+(use-package rmoo-autoload
+  :bind ("C-c C-r" . rmoo)
+  :commands rmoo-worlds-add-new-moo
+  :load-path "~/lib/emacs/rmoo"
+  :init
+  (add-hook 'rmoo-interactive-mode-hooks (lambda ()
+                                           (display-line-numbers-mode -1) ;; ... no line numbers
+                                           (goto-address-mode t)))) ;; ... clickable links
+(use-package moocode-mode
+  :mode "\\.moo$")
 ```
 
 ### World Management
