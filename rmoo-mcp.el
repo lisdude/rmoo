@@ -299,6 +299,16 @@
            'rmoo-mcp-nil-function)
           (t nil))))
 
+(rmoo-mcp-register "dns-com-awns-displayurl"
+		   '(("url" . 'required))
+		   'rmoo-mcp-do-displayurl
+		   "1.0"
+		   "1.0"
+		   nil)
+
+(defun rmoo-mcp-do-displayurl (url)
+  (browse-url url))
+
 (defun rmoo-mcp-nil-function (line) "Okay, this is a kludge")
 
 (defun rmoo-mcp-output-function-hooks ())
